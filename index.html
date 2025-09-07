@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Blog Personal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .blog-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .blog-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .blog-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .blog-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .blog-item {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .blog-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .blog-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        .blog-content {
+            padding: 15px;
+        }
+        
+        .blog-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .blog-description {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .blog-category {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .category-badge {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        .category-badge:hover {
+            background-color: #2980b9;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            grid-column: 1 / -1;
+        }
+        
+        .edit-delete-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .edit-btn, .delete-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .edit-btn {
+            background-color: #2ecc71;
+        }
+        
+        .edit-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mi Blog Personal</h1>
+        <p>Crea y gestiona tus publicaciones de forma sencilla</p>
+    </header>
+    
+    <div class="controls">
+        <button id="add-post-btn">Agregar nueva viñeta</button>
+        <button id="add-category-btn">Crear nueva categoría</button>
+        <button id="filter-category-btn">Buscar por categoría</button>
+    </div>
+    
+    <div class="blog-container" id="blog-container">
+        <div class="empty-state" id="empty-state">
+            <h3>No hay publicaciones aún</h3>
+            <p>Haz clic en "Agregar nueva viñeta" para crear tu primera publicación.</p>
+        </div>
+    </div>
+    
+    <!-- Modal para agregar/editar publicación -->
+    <div class="modal" id="post-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Nueva Publicación</h2>
+            <div class="form-group">
+                <label for="post-image">Imagen (URL)</label>
+                <input type="text" id="post-image" placeholder="Pega la URL de una imagen">
+            </div>
+            <div class="form-group">
+                <label for="post-title">Título</label>
+                <input type="text" id="post-title" placeholder="Título de la publicación">
+            </div>
+            <div class="form-group">
+                <label for="post-description">Descripción</label>
+                <textarea id="post-description" placeholder="Descripción de la publicación"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Categorías disponibles</label>
+                <div id="categories-container"></div>
+            </div>
+            <div class="modal-buttons">
+                <button id="cancel-post">Cancelar</button>
+                <button id="save-post">Publicar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para crear categoría -->
+    <div class="modal" id="category-modal">
+        <div class="modal-content">
+            <h2>Crear Nueva Categoría</h2>
+            <div class="form-group">
+                <label for="new-category">Nombre de la categoría</label>
+                <input type="text" id="new-category" placeholder="Nombre de la categoría">
+            </div>
+            <div class="modal-buttons">
+                <button id="cancel-category">Cancelar</button>
+                <button id="save-category">Crear</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para filtrar por categoría -->
+    <div class="modal" id="filter-modal">
+        <div class="modal-content">
+            <h2>Filtrar por Categoría</h2>
+            <div id="filter-categories-container"></div>
+            <div class="modal-buttons">
+                <button id="clear-filter">Mostrar Todas</button>
+                <button id="close-filter">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let posts = JSON.parse(localStorage.getItem('blogPosts')) || [];
+        let categories = JSON.parse(localStorage.getItem('blogCategories')) || [];
+        let currentFilter = null;
+        let editingPostId = null;
+
+        // Elementos del DOM
+        const blogContainer = document.getElementById('blog-container');
+        const emptyState = document.getElementById('empty-state');
+        const postModal = document.getElementById('post-modal');
+        const categoryModal = document.getElementById('category-modal');
+        const filterModal = document.getElementById('filter-modal');
+        const categoriesContainer = document.getElementById('categories-container');
+        const filterCategoriesContainer = document.getElementById('filter-categories-container');
+
+        // Botones de control
+        document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
+        document.getElementById('add-category-btn').addEventListener('click', () => openCategoryModal());
+        document.getElementById('filter-category-btn').addEventListener('click', () => openFilterModal());
+        
+        // Botones de modales
+        document.getElementById('cancel-post').addEventListener('click', () => closePostModal());
+        document.getElementById('save-post').addEventListener('click', () => savePost());
+        document.getElementById('cancel-category').addEventListener('click', () => closeCategoryModal());
+        document.getElementById('save-category').addEventListener('click', () => saveCategory());
+        document.getElementById('clear-filter').addEventListener('click', () => clearFilter());
+        document.getElementById('close-filter').addEventListener('click', () => closeFilterModal());
+
+        // Inicializar la página
+        function init() {
+            renderPosts();
+            updateCategoriesUI();
+        }
+
+        // Renderizar las publicaciones
+        function renderPosts() {
+            blogContainer.innerHTML = '';
+            
+            let filteredPosts = posts;
+            if (currentFilter) {
+                filteredPosts = posts.filter(post => post.category === currentFilter);
+            }
+            
+            if (filteredPosts.length === 0) {
+                emptyState.style.display = 'block';
+                if (currentFilter) {
+                    emptyState.innerHTML = `
+                        <h3>No hay publicaciones en la categoría "${currentFilter}"</h3>
+                        <p>Intenta con otra categoría o crea una nueva publicación.</p>
+                    `;
+                }
+                blogContainer.appendChild(emptyState);
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            filteredPosts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'blog-item';
+                postElement.innerHTML = `
+                    ${post.image ? `<img src="${post.image}" alt="${post.title}" class="blog-image">` : ''}
+                    <div class="blog-content">
+                        ${post.title ? `<h3 class="blog-title">${post.title}</h3>` : ''}
+                        ${post.description ? `<p class="blog-description">${post.description}</p>` : ''}
+                        ${post.category ? `<span class="blog-category">${post.category}</span>` : ''}
+                        <div class="edit-delete-buttons">
+                            <button class="edit-btn" data-id="${post.id}">Editar</button>
+                            <button class="delete-btn" data-id="${post.id}">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+                blogContainer.appendChild(postElement);
+            });
+            
+            // Agregar event listeners a los botones de editar y eliminar
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const postId = e.target.getAttribute('data-id');
+                    editPost(postId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const postId = e.target.getAttribute('data-id');
+                    deletePost(postId);
+                });
+            });
+        }
+
+        // Abrir modal para nueva publicación
+        function openPostModal(post = null) {
+            editingPostId = post ? post.id : null;
+            document.getElementById('modal-title').textContent = post ? 'Editar Publicación' : 'Nueva Publicación';
+            document.getElementById('post-image').value = post ? post.image : '';
+            document.getElementById('post-title').value = post ? post.title : '';
+            document.getElementById('post-description').value = post ? post.description : '';
+            
+            // Actualizar categorías disponibles
+            updateCategoriesUI();
+            
+            // Marcar categoría seleccionada si existe
+            if (post && post.category) {
+                const categoryBadge = document.querySelector(`.category-badge[data-category="${post.category}"]`);
+                if (categoryBadge) {
+                    categoryBadge.classList.add('selected');
+                    categoryBadge.style.backgroundColor = '#2c3e50';
+                }
+            }
+            
+            postModal.style.display = 'flex';
+        }
+
+        // Cerrar modal de publicación
+        function closePostModal() {
+            postModal.style.display = 'none';
+            editingPostId = null;
+        }
+
+        // Guardar publicación
+        function savePost() {
+            const image = document.getElementById('post-image').value;
+            const title = document.getElementById('post-title').value;
+            const description = document.getElementById('post-description').value;
+            
+            // Obtener categoría seleccionada
+            const selectedCategory = document.querySelector('.category-badge.selected');
+            const category = selectedCategory ? selectedCategory.getAttribute('data-category') : '';
+            
+            if (editingPostId) {
+                // Editar publicación existente
+                const index = posts.findIndex(post => post.id === editingPostId);
+                if (index !== -1) {
+                    posts[index] = {
+                        ...posts[index],
+                        image,
+                        title,
+                        description,
+                        category
+                    };
+                }
+            } else {
+                // Crear nueva publicación
+                const newPost = {
+                    id: Date.now().toString(),
+                    image,
+                    title,
+                    description,
+                    category,
+                    date: new Date().toISOString()
+                };
+                posts.unshift(newPost);
+            }
+            
+            // Guardar en localStorage y actualizar UI
+            localStorage.setItem('blogPosts', JSON.stringify(posts));
+            renderPosts();
+            closePostModal();
+        }
+
+        // Editar publicación
+        function editPost(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                openPostModal(post);
+            }
+        }
+
+        // Eliminar publicación
+        function deletePost(postId) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
+                posts = posts.filter(post => post.id !== postId);
+                localStorage.setItem('blogPosts', JSON.stringify(posts));
+                renderPosts();
+            }
+        }
+
+        // Abrir modal para crear categoría
+        function openCategoryModal() {
+            categoryModal.style.display = 'flex';
+        }
+
+        // Cerrar modal de categoría
+        function closeCategoryModal() {
+            document.getElementById('new-category').value = '';
+            categoryModal.style.display = 'none';
+        }
+
+        // Guardar categoría
+        function saveCategory() {
+            const categoryName = document.getElementById('new-category').value.trim();
+            
+            if (categoryName && !categories.includes(categoryName)) {
+                categories.push(categoryName);
+                localStorage.setItem('blogCategories', JSON.stringify(categories));
+                updateCategoriesUI();
+                closeCategoryModal();
+            } else if (categories.includes(categoryName)) {
+                alert('Esta categoría ya existe.');
+            }
+        }
+
+        // Actualizar la UI de categorías
+        function updateCategoriesUI() {
+            categoriesContainer.innerHTML = '';
+            
+            if (categories.length === 0) {
+                categoriesContainer.innerHTML = '<p>No hay categorías creadas aún.</p>';
+                return;
+            }
+            
+            categories.forEach(category => {
+                const badge = document.createElement('span');
+                badge.className = 'category-badge';
+                badge.textContent = category;
+                badge.setAttribute('data-category', category);
+                badge.addEventListener('click', toggleCategorySelection);
+                categoriesContainer.appendChild(badge);
+            });
+            
+            // Actualizar también el modal de filtro
+            updateFilterCategoriesUI();
+        }
+
+        // Actualizar la UI de categorías para el filtro
+        function updateFilterCategoriesUI() {
+            filterCategoriesContainer.innerHTML = '';
+            
+            if (categories.length === 0) {
+                filterCategoriesContainer.innerHTML = '<p>No hay categorías creadas aún.</p>';
+                return;
+            }
+            
+            categories.forEach(category => {
+                const badge = document.createElement('span');
+                badge.className = 'category-badge';
+                badge.textContent = category;
+                badge.setAttribute('data-category', category);
+                badge.addEventListener('click', () => filterByCategory(category));
+                filterCategoriesContainer.appendChild(badge);
+            });
+        }
+
+        // Alternar selección de categoría
+        function toggleCategorySelection(e) {
+            // Deseleccionar todas las categorías
+            document.querySelectorAll('.category-badge').forEach(badge => {
+                badge.classList.remove('selected');
+                badge.style.backgroundColor = '#3498db';
+            });
+            
+            // Seleccionar la categoría clickeada
+            e.target.classList.add('selected');
+            e.target.style.backgroundColor = '#2c3e50';
+        }
+
+        // Abrir modal de filtro
+        function openFilterModal() {
+            updateFilterCategoriesUI();
+            filterModal.style.display = 'flex';
+        }
+
+        // Cerrar modal de filtro
+        function closeFilterModal() {
+            filterModal.style.display = 'none';
+        }
+
+        // Filtrar por categoría
+        function filterByCategory(category) {
+            currentFilter = category;
+            renderPosts();
+            closeFilterModal();
+        }
+
+        // Limpiar filtro
+        function clearFilter() {
+            currentFilter = null;
+            renderPosts();
+            closeFilterModal();
+        }
+
+        // Inicializar la aplicación
+        init();
+    </script>
+</body>
+</html>
