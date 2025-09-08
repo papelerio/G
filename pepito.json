@@ -1,21 +1,17 @@
 {
   "posts": [
     {
-      "id": "1757292538266",
-      "image": "",
-      "title": "hola",
-      "description": "",
-      "category": "",
-      "date": "2025-09-08T00:48:58.266Z"
-    },
-    {
-      "id": "1757291243347",
+      "id": "1757296269633",
       "image": "http://imgfz.com/i/AdgUo4m.png",
-      "title": "https://imgfz.com/es/",
-      "description": "https://imgfz.com/es/",
-      "category": "",
-      "date": "2025-09-08T00:27:23.347Z"
+      "title": "Almacenar imagenes gratis",
+      "description": "es gratis y ya we",
+      "link": "https://imgfz.com/es/",
+      "category": "Links",
+      "date": "2025-09-08T01:51:09.633Z"
     }
   ],
-  "categories": []
+  "categories": [
+    "Links",
+    "Mis paginas web"
+  ]
 }
