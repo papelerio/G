@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Blog - Modo Por Defecto y Personal</title>
+    <title>Mi Blog - Modo por Defecto y Personal</title>
     <style>
         :root {
             --primary-color: #3498db;
@@ -51,7 +51,7 @@
         }
         
         .mode-btn {
-            padding: 12px 25px;
+            padding: 12px 24px;
             border: none;
             border-radius: 5px;
             background-color: var(--primary-color);
@@ -66,10 +66,6 @@
             background-color: var(--secondary-color);
             transform: scale(1.05);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .mode-btn:hover {
-            background-color: var(--secondary-color);
         }
         
         .controls {
@@ -322,26 +318,33 @@
             border-radius: 8px;
             margin: 20px 0;
             font-size: 14px;
-            text-align: center;
         }
     </style>
 </head>
 <body>
     <header>
         <h1>Mi Blog - Dos Modos de Visualización</h1>
-        <p>Selecciona entre el modo por defecto (solo lectura) o personal (edición completa)</p>
+        <p>Selecciona entre el modo por defecto (lee de pepito.json) o modo personal (editable)</p>
         
         <div class="mode-selector">
-            <button class="mode-btn active" id="default-mode">Por Defecto</button>
-            <button class="mode-btn" id="personal-mode">Personal</button>
+            <button id="default-mode" class="mode-btn active">Por Defecto</button>
+            <button id="personal-mode" class="mode-btn">Personal</button>
         </div>
     </header>
     
-    <div class="info-box" id="mode-info">
-        Modo Por Defecto: Visualizando datos desde blog-data.json (solo lectura)
+    <div class="info-box" id="default-info">
+        <h3>Modo Por Defecto</h3>
+        <p>Estás viendo los datos del archivo <strong>pepito.json</strong> almacenado en GitHub.</p>
+        <p>En este modo no puedes editar el contenido. Cambia al modo Personal para editar.</p>
     </div>
     
-    <div class="controls" id="controls-container" style="display: none;">
+    <div class="info-box" id="personal-info" style="display: none;">
+        <h3>Modo Personal</h3>
+        <p>Estás viendo y editando tu propio contenido local.</p>
+        <p>Puedes agregar nuevas publicaciones, crear categorías y cargar tus propios datos JSON.</p>
+    </div>
+    
+    <div class="controls" id="editing-controls" style="display: none;">
         <button id="add-post-btn">Agregar nueva viñeta</button>
         <button id="add-category-btn">Crear nueva categoría</button>
         <button id="filter-category-btn">Buscar por categoría</button>
@@ -351,13 +354,13 @@
     
     <div class="blog-container" id="blog-container">
         <div class="empty-state" id="empty-state">
-            <h3>Cargando datos...</h3>
-            <p>Esperando para cargar la información del blog.</p>
+            <h3>Cargando contenido...</h3>
+            <p>Esperando datos del archivo pepito.json</p>
         </div>
     </div>
     
     <div id="json-section" style="display: none;">
-        <h3>Vista previa del JSON (Modo Personal)</h3>
+        <h3>Vista previa del JSON Personal</h3>
         <div class="json-viewer" id="json-viewer">
             {/* El contenido JSON se mostrará aquí */}
         </div>
@@ -427,11 +430,10 @@
     <script>
         // Variables globales
         let posts = [];
-        let defaultPosts = [];
         let categories = [];
         let currentFilter = null;
         let editingPostId = null;
-        let currentMode = 'default'; // 'default' or 'personal'
+        let currentMode = 'default'; // 'default' o 'personal'
 
         // Elementos del DOM
         const blogContainer = document.getElementById('blog-container');
@@ -444,11 +446,12 @@
         const jsonViewer = document.getElementById('json-viewer');
         const jsonFileInput = document.getElementById('json-file-input');
         const notification = document.getElementById('notification');
-        const controlsContainer = document.getElementById('controls-container');
-        const jsonSection = document.getElementById('json-section');
-        const modeInfo = document.getElementById('mode-info');
         const defaultModeBtn = document.getElementById('default-mode');
         const personalModeBtn = document.getElementById('personal-mode');
+        const editingControls = document.getElementById('editing-controls');
+        const defaultInfo = document.getElementById('default-info');
+        const personalInfo = document.getElementById('personal-info');
+        const jsonSection = document.getElementById('json-section');
 
         // Botones de control
         document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
@@ -472,11 +475,81 @@
 
         // Inicializar la página
         function init() {
-            // Cargar datos por defecto desde blog-data.json
+            // Cargar datos por defecto primero
             loadDefaultData();
+        }
+
+        // Cambiar entre modos
+        function switchMode(mode) {
+            currentMode = mode;
             
-            // Intentar cargar datos personales del localStorage
-            const savedData = localStorage.getItem('blogPersonalData');
+            // Actualizar botones de modo
+            if (mode === 'default') {
+                defaultModeBtn.classList.add('active');
+                personalModeBtn.classList.remove('active');
+                editingControls.style.display = 'none';
+                defaultInfo.style.display = 'block';
+                personalInfo.style.display = 'none';
+                jsonSection.style.display = 'none';
+                
+                // Cargar datos por defecto
+                loadDefaultData();
+            } else {
+                defaultModeBtn.classList.remove('active');
+                personalModeBtn.classList.add('active');
+                editingControls.style.display = 'flex';
+                defaultInfo.style.display = 'none';
+                personalInfo.style.display = 'block';
+                jsonSection.style.display = 'block';
+                
+                // Cargar datos personales
+                loadPersonalData();
+            }
+        }
+
+        // Cargar datos por defecto desde pepito.json
+        function loadDefaultData() {
+  emptyState.innerHTML = `
+    <h3>Cargando contenido...</h3>
+    <p>Esperando datos del archivo pepito.json</p>
+  `;
+            
+            // En un caso real, aquí cargarías el archivo pepito.json desde GitHub
+            // Para este ejemplo, simulamos una carga con timeout
+            setTimeout(() => {
+                // Datos de ejemplo (en un caso real, estos vendrían de pepito.json)
+                const defaultData = {
+                    posts: [
+                        {
+                            id: "1",
+                            image: "https://picsum.photos/400/200?random=1",
+                            title: "Ejemplo de publicación",
+                            description: "Esta es una publicación de ejemplo cargada desde pepito.json",
+                            category: "Tecnología",
+                            date: "2023-05-15T12:00:00.000Z"
+                        },
+                        {
+                            id: "2",
+                            image: "https://picsum.photos/400/200?random=2",
+                            title: "Otra publicación de ejemplo",
+                            description: "Contenido de muestra para demostrar el modo por defecto",
+                            category: "Educación",
+                            date: "2023-05-16T14:30:00.000Z"
+                        }
+                    ],
+                    categories: ["Tecnología", "Educación", "Deportes"]
+                };
+                
+                posts = defaultData.posts;
+                categories = defaultData.categories;
+                
+                renderPosts();
+            }, 1000);
+        }
+
+        // Cargar datos personales desde localStorage
+        function loadPersonalData() {
+            const savedData = localStorage.getItem('blogData');
             if (savedData) {
                 try {
                     const data = JSON.parse(savedData);
@@ -487,6 +560,9 @@
                     posts = [];
                     categories = [];
                 }
+            } else {
+                posts = [];
+                categories = [];
             }
             
             renderPosts();
@@ -494,83 +570,13 @@
             updateJSONView();
         }
 
-        // Cargar datos por defecto
-        function loadDefaultData() {
-            // En un caso real, esto cargaría desde blog-data.json
-            // Por ahora usamos datos de ejemplo
-            defaultPosts = [
-                {
-                    id: "default1",
-                    image: "https://via.placeholder.com/300x150?text=Imagen+1",
-                    title: "Ejemplo de publicación",
-                    description: "Esta es una publicación de ejemplo cargada desde los datos por defecto.",
-                    category: "Tecnología",
-                    date: "2023-05-15T12:00:00.000Z"
-                },
-                {
-                    id: "default2",
-                    image: "https://via.placeholder.com/300x150?text=Imagen+2",
-                    title: "Otra publicación",
-                    description: "Otra publicación de ejemplo para mostrar el modo por defecto.",
-                    category: "Educación",
-                    date: "2023-05-16T10:30:00.000Z"
-                }
-            ];
-            
-            // En una implementación real, usarías fetch:
-            /*
-            fetch('blog-data.json')
-                .then(response => response.json())
-                .then(data => {
-                    defaultPosts = data.posts || [];
-                    if (currentMode === 'default') {
-                        renderPosts();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error cargando blog-data.json:', error);
-                    emptyState.innerHTML = `
-                        <h3>Error cargando los datos</h3>
-                        <p>No se pudo cargar el archivo blog-data.json.</p>
-                    `;
-                });
-            */
-        }
-
-        // Cambiar entre modos
-        function switchMode(mode) {
-            currentMode = mode;
-            
-            // Actualizar botones de modo
-            defaultModeBtn.classList.toggle('active', mode === 'default');
-            personalModeBtn.classList.toggle('active', mode === 'personal');
-            
-            // Mostrar/ocultar controles
-            controlsContainer.style.display = mode === 'personal' ? 'flex' : 'none';
-            jsonSection.style.display = mode === 'personal' ? 'block' : 'none';
-            
-            // Actualizar texto informativo
-            modeInfo.textContent = mode === 'default' 
-                ? "Modo Por Defecto: Visualizando datos desde blog-data.json (solo lectura)" 
-                : "Modo Personal: Editando con datos locales (puedes modificar y cargar JSON)";
-            
-            // Renderizar publicaciones
-            renderPosts();
-            
-            if (mode === 'personal') {
-                updateJSONView();
-            }
-        }
-
         // Renderizar las publicaciones
         function renderPosts() {
             blogContainer.innerHTML = '';
             
-            let postsToRender = currentMode === 'default' ? defaultPosts : posts;
-            let filteredPosts = postsToRender;
-            
-            if (currentFilter && currentMode === 'personal') {
-                filteredPosts = postsToRender.filter(post => post.category === currentFilter);
+            let filteredPosts = posts;
+            if (currentFilter) {
+                filteredPosts = posts.filter(post => post.category === currentFilter);
             }
             
             if (filteredPosts.length === 0) {
@@ -583,7 +589,7 @@
                 } else {
                     emptyState.innerHTML = `
                         <h3>No hay publicaciones aún</h3>
-                        <p>${currentMode === 'default' ? 'El archivo blog-data.json no contiene publicaciones.' : 'Haz clic en "Agregar nueva viñeta" para crear tu primera publicación.'}</p>
+                        <p>Haz clic en "Agregar nueva viñeta" para crear tu primera publicación.</p>
                     `;
                 }
                 blogContainer.appendChild(emptyState);
@@ -756,10 +762,8 @@
             }
         }
 
-        // Actualizar la UI de categorías (solo en modo personal)
+        // Actualizar la UI de categorías
         function updateCategoriesUI() {
-            if (currentMode !== 'personal') return;
-            
             categoriesContainer.innerHTML = '';
             
             if (categories.length === 0) {
@@ -780,10 +784,8 @@
             updateFilterCategoriesUI();
         }
 
-        // Actualizar la UI de categorías para el filtro (solo en modo personal)
+        // Actualizar la UI de categorías para el filtro
         function updateFilterCategoriesUI() {
-            if (currentMode !== 'personal') return;
-            
             filterCategoriesContainer.innerHTML = '';
             
             if (categories.length === 0) {
@@ -803,6 +805,8 @@
 
         // Alternar selección de categoría
         function toggleCategorySelection(e) {
+            if (currentMode !== 'personal') return;
+            
             // Deseleccionar todas las categorías
             document.querySelectorAll('.category-badge').forEach(badge => {
                 badge.classList.remove('selected');
@@ -812,7 +816,7 @@
             e.target.classList.add('selected');
         }
 
-        // Abrir modal de filtro (solo en modo personal)
+        // Abrir modal de filtro
         function openFilterModal() {
             if (currentMode !== 'personal') return;
             
@@ -825,19 +829,15 @@
             filterModal.style.display = 'none';
         }
 
-        // Filtrar por categoría (solo en modo personal)
+        // Filtrar por categoría
         function filterByCategory(category) {
-            if (currentMode !== 'personal') return;
-            
             currentFilter = category;
             renderPosts();
             closeFilterModal();
         }
 
-        // Limpiar filtro (solo en modo personal)
+        // Limpiar filtro
         function clearFilter() {
-            if (currentMode !== 'personal') return;
-            
             currentFilter = null;
             renderPosts();
             closeFilterModal();
@@ -852,14 +852,12 @@
                 categories
             };
             
-            localStorage.setItem('blogPersonalData', JSON.stringify(data));
+            localStorage.setItem('blogData', JSON.stringify(data));
             updateJSONView();
         }
 
-        // Actualizar la vista del JSON (solo en modo personal)
+        // Actualizar la vista del JSON
         function updateJSONView() {
-            if (currentMode !== 'personal') return;
-            
             const data = {
                 posts,
                 categories
@@ -883,7 +881,7 @@
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'blog-personal-data.json';
+            a.download = 'blog-data.json';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
