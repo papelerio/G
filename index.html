@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Blog Personal</title>
+    <title>Mi Blog - Almacenamiento en JSON</title>
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+        }
+        
         * {
             box-sizing: border-box;
             margin: 0;
@@ -29,8 +38,16 @@
         }
         
         h1 {
-            color: #2c3e50;
+            color: var(--secondary-color);
             margin-bottom: 10px;
+        }
+        
+        .github-info {
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
         }
         
         .controls {
@@ -45,14 +62,22 @@
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            background-color: #3498db;
+            background-color: var(--primary-color);
             color: white;
             cursor: pointer;
             transition: background-color 0.3s;
         }
         
         button:hover {
-            background-color: #2980b9;
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
         }
         
         .blog-container {
@@ -86,6 +111,7 @@
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
+            position: relative;
         }
         
         .blog-item:hover {
@@ -105,7 +131,7 @@
         .blog-title {
             font-size: 18px;
             margin-bottom: 10px;
-            color: #2c3e50;
+            color: var(--secondary-color);
         }
         
         .blog-description {
@@ -116,7 +142,7 @@
         
         .blog-category {
             display: inline-block;
-            background-color: #e74c3c;
+            background-color: var(--accent-color);
             color: white;
             padding: 3px 8px;
             border-radius: 15px;
@@ -143,11 +169,13 @@
             width: 90%;
             max-width: 600px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .modal h2 {
             margin-bottom: 20px;
-            color: #2c3e50;
+            color: var(--secondary-color);
         }
         
         .form-group {
@@ -182,7 +210,7 @@
         
         .category-badge {
             display: inline-block;
-            background-color: #3498db;
+            background-color: var(--primary-color);
             color: white;
             padding: 5px 10px;
             border-radius: 20px;
@@ -190,8 +218,8 @@
             cursor: pointer;
         }
         
-        .category-badge:hover {
-            background-color: #2980b9;
+        .category-badge.selected {
+            background-color: var(--secondary-color);
         }
         
         .empty-state {
@@ -213,7 +241,7 @@
         }
         
         .edit-btn {
-            background-color: #2ecc71;
+            background-color: var(--success-color);
         }
         
         .edit-btn:hover {
@@ -221,30 +249,78 @@
         }
         
         .delete-btn {
-            background-color: #e74c3c;
+            background-color: var(--accent-color);
         }
         
         .delete-btn:hover {
             background-color: #c0392b;
         }
+        
+        .json-viewer {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Mi Blog Personal</h1>
-        <p>Crea y gestiona tus publicaciones de forma sencilla</p>
+        <h1>Mi Blog con Almacenamiento JSON</h1>
+        <p>Todos los cambios se guardan en un archivo JSON para GitHub</p>
+        
+        <div class="github-info">
+            <h3>Configuración para GitHub</h3>
+            <p>1. Crea un repositorio en GitHub</p>
+            <p>2. Sube este archivo HTML como index.html</p>
+            <p>3. Crea un archivo llamado <strong>blog-data.json</strong> con contenido inicial: <code>{"posts": [], "categories": []}</code></p>
+            <p>4. Activa GitHub Pages en la configuración del repositorio</p>
+            <p>5. Para actualizaciones automáticas, necesitarías usar GitHub API o GitHub Pages con un enfoque especial</p>
+        </div>
     </header>
     
     <div class="controls">
         <button id="add-post-btn">Agregar nueva viñeta</button>
         <button id="add-category-btn">Crear nueva categoría</button>
         <button id="filter-category-btn">Buscar por categoría</button>
+        <button id="download-json" class="btn-success">Descargar JSON</button>
+        <button id="load-json">Cargar desde JSON</button>
     </div>
     
     <div class="blog-container" id="blog-container">
         <div class="empty-state" id="empty-state">
             <h3>No hay publicaciones aún</h3>
             <p>Haz clic en "Agregar nueva viñeta" para crear tu primera publicación.</p>
+        </div>
+    </div>
+    
+    <div>
+        <h3>Vista previa del JSON</h3>
+        <div class="json-viewer" id="json-viewer">
+            {/* El contenido JSON se mostrará aquí */}
         </div>
     </div>
     
@@ -301,11 +377,18 @@
             </div>
         </div>
     </div>
+    
+    <!-- Input oculto para cargar JSON -->
+    <input type="file" id="json-file-input" accept=".json" style="display: none;">
+    
+    <div class="notification" id="notification">
+        ¡JSON actualizado correctamente!
+    </div>
 
     <script>
         // Variables globales
-        let posts = JSON.parse(localStorage.getItem('blogPosts')) || [];
-        let categories = JSON.parse(localStorage.getItem('blogCategories')) || [];
+        let posts = [];
+        let categories = [];
         let currentFilter = null;
         let editingPostId = null;
 
@@ -317,11 +400,17 @@
         const filterModal = document.getElementById('filter-modal');
         const categoriesContainer = document.getElementById('categories-container');
         const filterCategoriesContainer = document.getElementById('filter-categories-container');
+        const jsonViewer = document.getElementById('json-viewer');
+        const jsonFileInput = document.getElementById('json-file-input');
+        const notification = document.getElementById('notification');
 
         // Botones de control
         document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
         document.getElementById('add-category-btn').addEventListener('click', () => openCategoryModal());
         document.getElementById('filter-category-btn').addEventListener('click', () => openFilterModal());
+        document.getElementById('download-json').addEventListener('click', () => downloadJSON());
+        document.getElementById('load-json').addEventListener('click', () => jsonFileInput.click());
+        jsonFileInput.addEventListener('change', (e) => loadJSONFromFile(e));
         
         // Botones de modales
         document.getElementById('cancel-post').addEventListener('click', () => closePostModal());
@@ -333,8 +422,23 @@
 
         // Inicializar la página
         function init() {
+            // Intentar cargar datos del localStorage primero
+            const savedData = localStorage.getItem('blogData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    posts = data.posts || [];
+                    categories = data.categories || [];
+                } catch (e) {
+                    console.error("Error parsing saved data:", e);
+                    posts = [];
+                    categories = [];
+                }
+            }
+            
             renderPosts();
             updateCategoriesUI();
+            updateJSONView();
         }
 
         // Renderizar las publicaciones
@@ -352,6 +456,11 @@
                     emptyState.innerHTML = `
                         <h3>No hay publicaciones en la categoría "${currentFilter}"</h3>
                         <p>Intenta con otra categoría o crea una nueva publicación.</p>
+                    `;
+                } else {
+                    emptyState.innerHTML = `
+                        <h3>No hay publicaciones aún</h3>
+                        <p>Haz clic en "Agregar nueva viñeta" para crear tu primera publicación.</p>
                     `;
                 }
                 blogContainer.appendChild(emptyState);
@@ -410,7 +519,6 @@
                 const categoryBadge = document.querySelector(`.category-badge[data-category="${post.category}"]`);
                 if (categoryBadge) {
                     categoryBadge.classList.add('selected');
-                    categoryBadge.style.backgroundColor = '#2c3e50';
                 }
             }
             
@@ -458,10 +566,11 @@
                 posts.unshift(newPost);
             }
             
-            // Guardar en localStorage y actualizar UI
-            localStorage.setItem('blogPosts', JSON.stringify(posts));
+            // Guardar y actualizar
+            saveData();
             renderPosts();
             closePostModal();
+            showNotification('¡Publicación guardada correctamente!');
         }
 
         // Editar publicación
@@ -476,8 +585,9 @@
         function deletePost(postId) {
             if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
                 posts = posts.filter(post => post.id !== postId);
-                localStorage.setItem('blogPosts', JSON.stringify(posts));
+                saveData();
                 renderPosts();
+                showNotification('Publicación eliminada correctamente');
             }
         }
 
@@ -498,9 +608,10 @@
             
             if (categoryName && !categories.includes(categoryName)) {
                 categories.push(categoryName);
-                localStorage.setItem('blogCategories', JSON.stringify(categories));
+                saveData();
                 updateCategoriesUI();
                 closeCategoryModal();
+                showNotification('Categoría creada correctamente');
             } else if (categories.includes(categoryName)) {
                 alert('Esta categoría ya existe.');
             }
@@ -552,12 +663,10 @@
             // Deseleccionar todas las categorías
             document.querySelectorAll('.category-badge').forEach(badge => {
                 badge.classList.remove('selected');
-                badge.style.backgroundColor = '#3498db';
             });
             
             // Seleccionar la categoría clickeada
             e.target.classList.add('selected');
-            e.target.style.backgroundColor = '#2c3e50';
         }
 
         // Abrir modal de filtro
@@ -585,8 +694,98 @@
             closeFilterModal();
         }
 
+        // Guardar datos en localStorage
+        function saveData() {
+            const data = {
+                posts,
+                categories
+            };
+            
+            localStorage.setItem('blogData', JSON.stringify(data));
+            updateJSONView();
+        }
+
+        // Actualizar la vista del JSON
+        function updateJSONView() {
+            const data = {
+                posts,
+                categories
+            };
+            
+            jsonViewer.textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Descargar JSON
+        function downloadJSON() {
+            const data = {
+                posts,
+                categories
+            };
+            
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'blog-data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('JSON descargado correctamente');
+        }
+
+        // Cargar JSON desde archivo
+        function loadJSONFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.posts && data.categories) {
+                        posts = data.posts;
+                        categories = data.categories;
+                        saveData();
+                        renderPosts();
+                        showNotification('Datos cargados correctamente desde el JSON');
+                    } else {
+                        alert('El archivo JSON no tiene el formato correcto.');
+                    }
+                } catch (error) {
+                    alert('Error al parsear el archivo JSON: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Limpiar el input
+            event.target.value = '';
+        }
+
+        // Mostrar notificación
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
         // Inicializar la aplicación
         init();
+        
+        // Para GitHub Pages: esta función simularía guardar en un archivo JSON real
+        // En un caso real, necesitarías usar GitHub API con un token de acceso
+        function saveToGitHub() {
+            // Esta es una función de ejemplo que necesitarías implementar
+            // con la API de GitHub para guardar directamente en el repositorio
+            console.log("Guardando en GitHub... (requiere implementación con GitHub API)");
+        }
     </script>
 </body>
 </html>
