@@ -13,6 +13,7 @@
             --dark-color: #34495e;
             --success-color: #2ecc71;
             --warning-color: #f39c12;
+            --link-color: #ffeb3b;
         }
         
         * {
@@ -106,6 +107,15 @@
             background-color: #e67e22;
         }
         
+        .btn-link {
+            background-color: var(--link-color);
+            color: #333;
+        }
+        
+        .btn-link:hover {
+            background-color: #ffc107;
+        }
+        
         .blog-container {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -138,6 +148,16 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
             position: relative;
+        }
+        
+        .blog-item.has-link {
+            border: 3px solid var(--link-color);
+            cursor: pointer;
+        }
+        
+        .blog-item.has-link:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         .blog-item:hover {
@@ -173,6 +193,18 @@
             padding: 3px 8px;
             border-radius: 15px;
             font-size: 12px;
+        }
+        
+        .blog-link-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--link-color);
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
         }
         
         .modal {
@@ -350,6 +382,9 @@
         <h3>Modo Por Defecto</h3>
         <p>Estás viendo los datos del archivo <strong>pepito.json</strong> almacenado en GitHub.</p>
         <p>En este modo no puedes editar el contenido. Cambia al modo Personal para editar.</p>
+        <div class="controls">
+            <button id="download-default-json" class="btn-link">Descargar JSON por Defecto</button>
+        </div>
     </div>
     
     <div class="info-box" id="personal-info" style="display: none;">
@@ -362,7 +397,7 @@
         <button id="add-post-btn">Agregar nueva viñeta</button>
         <button id="add-category-btn">Crear nueva categoría</button>
         <button id="filter-category-btn">Buscar por categoría</button>
-        <button id="download-json" class="btn-success">Descargar JSON</button>
+        <button id="download-json" class="btn-success">Descargar JSON Personal</button>
         <button id="load-json" class="btn-warning">Cargar desde JSON</button>
     </div>
     
@@ -395,6 +430,10 @@
             <div class="form-group">
                 <label for="post-description">Descripción</label>
                 <textarea id="post-description" placeholder="Descripción de la publicación"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="post-link">Enlace (URL opcional)</label>
+                <input type="text" id="post-link" placeholder="https://ejemplo.com">
             </div>
             <div class="form-group">
                 <label>Categorías disponibles</label>
@@ -448,6 +487,7 @@
         let currentFilter = null;
         let editingPostId = null;
         let currentMode = 'default'; // 'default' o 'personal'
+        let defaultData = {}; // Almacenar datos por defecto
 
         // Elementos del DOM
         const blogContainer = document.getElementById('blog-container');
@@ -466,6 +506,7 @@
         const defaultInfo = document.getElementById('default-info');
         const personalInfo = document.getElementById('personal-info');
         const jsonSection = document.getElementById('json-section');
+        const downloadDefaultJsonBtn = document.getElementById('download-default-json');
 
         // Botones de control
         document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
@@ -474,6 +515,7 @@
         document.getElementById('download-json').addEventListener('click', () => downloadJSON());
         document.getElementById('load-json').addEventListener('click', () => jsonFileInput.click());
         jsonFileInput.addEventListener('change', (e) => loadJSONFromFile(e));
+        downloadDefaultJsonBtn.addEventListener('click', () => downloadDefaultJSON());
         
         // Botones de modales
         document.getElementById('cancel-post').addEventListener('click', () => closePostModal());
@@ -537,6 +579,7 @@
                     return response.json();
                 })
                 .then(data => {
+                    defaultData = data;
                     posts = data.posts || [];
                     categories = data.categories || [];
                     renderPosts();
@@ -604,10 +647,19 @@
             
             filteredPosts.forEach(post => {
                 const postElement = document.createElement('div');
-                postElement.className = 'blog-item';
+                postElement.className = `blog-item ${post.link ? 'has-link' : ''}`;
+                
+                // Si tiene enlace, hacer que sea clickeable
+                if (post.link) {
+                    postElement.addEventListener('click', () => {
+                        window.open(post.link, '_blank');
+                    });
+                }
+                
                 postElement.innerHTML = `
                     ${post.image ? `<img src="${post.image}" alt="${post.title}" class="blog-image">` : ''}
                     <div class="blog-content">
+                        ${post.link ? '<div class="blog-link-indicator">Enlace</div>' : ''}
                         ${post.title ? `<h3 class="blog-title">${post.title}</h3>` : ''}
                         ${post.description ? `<p class="blog-description">${post.description}</p>` : ''}
                         ${post.category ? `<span class="blog-category">${post.category}</span>` : ''}
@@ -626,6 +678,7 @@
                 // Agregar event listeners a los botones de editar y eliminar
                 document.querySelectorAll('.edit-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Evitar que se active el enlace de la viñeta
                         const postId = e.target.getAttribute('data-id');
                         editPost(postId);
                     });
@@ -633,6 +686,7 @@
                 
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Evitar que se active el enlace de la viñeta
                         const postId = e.target.getAttribute('data-id');
                         deletePost(postId);
                     });
@@ -649,6 +703,7 @@
             document.getElementById('post-image').value = post ? post.image : '';
             document.getElementById('post-title').value = post ? post.title : '';
             document.getElementById('post-description').value = post ? post.description : '';
+            document.getElementById('post-link').value = post ? post.link || '' : '';
             
             // Actualizar categorías disponibles
             updateCategoriesUI();
@@ -677,6 +732,7 @@
             const image = document.getElementById('post-image').value;
             const title = document.getElementById('post-title').value;
             const description = document.getElementById('post-description').value;
+            const link = document.getElementById('post-link').value;
             
             // Obtener categoría seleccionada
             const selectedCategory = document.querySelector('.category-badge.selected');
@@ -691,6 +747,7 @@
                         image,
                         title,
                         description,
+                        link,
                         category
                     };
                 }
@@ -701,6 +758,7 @@
                     image,
                     title,
                     description,
+                    link,
                     category,
                     date: new Date().toISOString()
                 };
@@ -885,13 +943,30 @@
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'blog-data.json';
+            a.download = 'blog-data-personal.json';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification('JSON descargado correctamente');
+            showNotification('JSON personal descargado correctamente');
+        }
+
+        // Descargar JSON por defecto
+        function downloadDefaultJSON() {
+            const jsonString = JSON.stringify(defaultData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pepito.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('JSON por defecto descargado correctamente');
         }
 
         // Cargar JSON desde archivo (solo en modo personal)
