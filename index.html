@@ -319,6 +319,20 @@
             margin: 20px 0;
             font-size: 14px;
         }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -509,42 +523,32 @@
 
         // Cargar datos por defecto desde pepito.json
         function loadDefaultData() {
-  emptyState.innerHTML = `
-    <h3>Cargando contenido...</h3>
-    <p>Esperando datos del archivo pepito.json</p>
-  `;
+            emptyState.innerHTML = `
+                <h3>Cargando contenido...</h3>
+                <p>Esperando datos del archivo pepito.json</p>
+            `;
             
-            // En un caso real, aquí cargarías el archivo pepito.json desde GitHub
-            // Para este ejemplo, simulamos una carga con timeout
-            setTimeout(() => {
-                // Datos de ejemplo (en un caso real, estos vendrían de pepito.json)
-                const defaultData = {
-                    posts: [
-                        {
-                            id: "1",
-                            image: "https://picsum.photos/400/200?random=1",
-                            title: "Ejemplo de publicación",
-                            description: "Esta es una publicación de ejemplo cargada desde pepito.json",
-                            category: "Tecnología",
-                            date: "2023-05-15T12:00:00.000Z"
-                        },
-                        {
-                            id: "2",
-                            image: "https://picsum.photos/400/200?random=2",
-                            title: "Otra publicación de ejemplo",
-                            description: "Contenido de muestra para demostrar el modo por defecto",
-                            category: "Educación",
-                            date: "2023-05-16T14:30:00.000Z"
-                        }
-                    ],
-                    categories: ["Tecnología", "Educación", "Deportes"]
-                };
-                
-                posts = defaultData.posts;
-                categories = defaultData.categories;
-                
-                renderPosts();
-            }, 1000);
+            // Cargar el archivo pepito.json desde GitHub
+            fetch('https://raw.githubusercontent.com/papelerio/G/main/pepito.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No se pudo cargar el archivo pepito.json');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    posts = data.posts || [];
+                    categories = data.categories || [];
+                    renderPosts();
+                })
+                .catch(error => {
+                    console.error('Error cargando pepito.json:', error);
+                    emptyState.innerHTML = `
+                        <h3>Error cargando los datos</h3>
+                        <p>No se pudo cargar el archivo pepito.json</p>
+                        <p>${error.message}</p>
+                    `;
+                });
         }
 
         // Cargar datos personales desde localStorage
