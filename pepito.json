@@ -1,9 +1,36 @@
 {
   "posts": [
     {
+      "id": "1757773426530",
+      "image": "http://imgfz.com/i/3CNZl1R.png",
+      "title": "dibuja poligonos",
+      "description": "H",
+      "link": "https://papelerio.github.io/H/",
+      "category": "Mis paginas web",
+      "date": "2025-09-13T14:23:46.530Z"
+    },
+    {
+      "id": "1757303040878",
+      "image": "http://imgfz.com/i/fj59eHt.png",
+      "title": "landviewer",
+      "description": "landviewer",
+      "link": "https://eos.com/landviewer/es?lat=-13.61575&lng=-68.97764&z=15&menuItem=search",
+      "category": "Links",
+      "date": "2025-09-08T03:44:00.878Z"
+    },
+    {
+      "id": "1757302988574",
+      "image": "http://imgfz.com/i/eTgALC6.png",
+      "title": "gooogle mapas",
+      "description": "mapas",
+      "link": "https://www.google.com/maps/d/u/0/?hl=es",
+      "category": "Links",
+      "date": "2025-09-08T03:43:08.574Z"
+    },
+    {
       "id": "1757299960611",
-      "image": "",
-      "title": "F",
+      "image": "http://imgfz.com/i/Y4BKHd2.png",
+      "title": "juego de cubo",
       "description": "F",
       "link": "https://papelerio.github.io/F/",
       "category": "Mis paginas web",
@@ -29,7 +56,7 @@
     },
     {
       "id": "1757298186350",
-      "image": "",
+      "image": "http://imgfz.com/i/OSjZRsr.png",
       "title": "Juego de carros",
       "description": "papelerio C",
       "link": "https://papelerio.github.io/C/",
@@ -38,7 +65,7 @@
     },
     {
       "id": "1757298146063",
-      "image": "",
+      "image": "http://imgfz.com/i/7lUGCdq.png",
       "title": "novela de kitty",
       "description": "papelerio B",
       "link": "https://papelerio.github.io/B/",
@@ -75,6 +102,7 @@
   ],
   "categories": [
     "Links",
-    "Mis paginas web"
+    "Mis paginas web",
+    "XD"
   ]
 }
