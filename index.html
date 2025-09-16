@@ -191,6 +191,11 @@
             box-shadow: 0 0 15px var(--warning-color);
         }
         
+        .blog-item.selected-for-insert {
+            border: 3px solid var(--success-color);
+            box-shadow: 0 0 15px var(--success-color);
+        }
+        
         .blog-image {
             width: 100%;
             height: 150px;
@@ -320,7 +325,7 @@
             margin-top: 15px;
         }
         
-        .edit-btn, .delete-btn, .reorder-btn {
+        .edit-btn, .delete-btn, .reorder-btn, .color-btn {
             padding: 5px 10px;
             font-size: 12px;
         }
@@ -353,6 +358,14 @@
             background-color: var(--secondary-color);
         }
         
+        .color-btn {
+            background-color: #9b59b6;
+        }
+        
+        .color-btn:hover {
+            background-color: #8e44ad;
+        }
+        
         .swap-instructions {
             text-align: center;
             padding: 10px;
@@ -361,6 +374,30 @@
             border-radius: 5px;
             font-size: 14px;
             display: none;
+        }
+        
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected {
+            border: 2px solid #000;
         }
         
         .json-viewer {
@@ -463,11 +500,11 @@
         <button id="filter-category-btn">Buscar por categoría</button>
         <button id="download-json" class="btn-success">Descargar JSON Personal</button>
         <button id="load-json" class="btn-warning">Cargar desde JSON</button>
-        <button id="cancel-swap" style="display: none;">Cancelar intercambio</button>
+        <button id="cancel-swap" style="display: none;">Cancelar reordenamiento</button>
     </div>
     
     <div class="swap-instructions" id="swap-instructions">
-        <p>Modo intercambio: Selecciona una segunda viñeta para intercambiar posiciones</p>
+        <p id="swap-instruction-text">Modo intercambio: Selecciona una segunda viñeta para intercambiar posiciones</p>
     </div>
     
     <div class="blog-container" id="blog-container">
@@ -530,6 +567,31 @@
         </div>
     </div>
     
+    <!-- Modal para seleccionar color -->
+    <div class="modal" id="color-modal">
+        <div class="modal-content">
+            <h2>Seleccionar Color de Fondo</h2>
+            <div class="color-palette" id="color-palette">
+                <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
+                <div class="color-option" style="background-color: #ffe6e6;" data-color="#ffe6e6"></div>
+                <div class="color-option" style="background-color: #e6ffe6;" data-color="#e6ffe6"></div>
+                <div class="color-option" style="background-color: #e6e6ff;" data-color="#e6e6ff"></div>
+                <div class="color-option" style="background-color: #ffffe6;" data-color="#ffffe6"></div>
+                <div class="color-option" style="background-color: #e6ffff;" data-color="#e6ffff"></div>
+                <div class="color-option" style="background-color: #ffe6ff;" data-color="#ffe6ff"></div>
+                <div class="color-option" style="background-color: #f0e6ff;" data-color="#f0e6ff"></div>
+                <div class="color-option" style="background-color: #ffe6cc;" data-color="#ffe6cc"></div>
+                <div class="color-option" style="background-color: #e6ccff;" data-color="#e6ccff"></div>
+                <div class="color-option" style="background-color: #ccffcc;" data-color="#ccffcc"></div>
+                <div class="color-option" style="background-color: #ffccff;" data-color="#ffccff"></div>
+            </div>
+            <div class="modal-buttons">
+                <button id="cancel-color">Cancelar</button>
+                <button id="save-color">Aplicar</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Modal para filtrar por categoría -->
     <div class="modal" id="filter-modal">
         <div class="modal-content">
@@ -570,14 +632,16 @@
         let currentMode = 'default'; // 'default' o 'personal'
         let defaultData = {}; // Almacenar datos por defecto
         let currentSearchTerm = '';
-        let swapMode = false;
+        let reorderMode = 0; // 0: inactivo, 1: intercambiar, 2: mover detrás
         let firstSelectedPost = null;
+        let colorEditingPostId = null;
 
         // Elementos del DOM
         const blogContainer = document.getElementById('blog-container');
         const emptyState = document.getElementById('empty-state');
         const postModal = document.getElementById('post-modal');
         const categoryModal = document.getElementById('category-modal');
+        const colorModal = document.getElementById('color-modal');
         const filterModal = document.getElementById('filter-modal');
         const filterDefaultModal = document.getElementById('filter-default-modal');
         const categoriesContainer = document.getElementById('categories-container');
@@ -596,7 +660,9 @@
         const searchInput = document.getElementById('search-input');
         const filterCategoryDefaultBtn = document.getElementById('filter-category-default-btn');
         const swapInstructions = document.getElementById('swap-instructions');
+        const swapInstructionText = document.getElementById('swap-instruction-text');
         const cancelSwapBtn = document.getElementById('cancel-swap');
+        const colorPalette = document.getElementById('color-palette');
 
         // Botones de control
         document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
@@ -607,7 +673,9 @@
         jsonFileInput.addEventListener('change', (e) => loadJSONFromFile(e));
         downloadDefaultJsonBtn.addEventListener('click', () => downloadDefaultJSON());
         filterCategoryDefaultBtn.addEventListener('click', () => openFilterDefaultModal());
-        cancelSwapBtn.addEventListener('click', () => cancelSwapMode());
+        cancelSwapBtn.addEventListener('click', () => cancelReorderMode());
+        document.getElementById('cancel-color').addEventListener('click', () => closeColorModal());
+        document.getElementById('save-color').addEventListener('click', () => saveColor());
         
         // Botones de modales
         document.getElementById('cancel-post').addEventListener('click', () => closePostModal());
@@ -627,6 +695,16 @@
         searchInput.addEventListener('input', (e) => {
             currentSearchTerm = e.target.value.toLowerCase();
             renderPosts();
+        });
+
+        // Eventos para la paleta de colores
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                document.querySelectorAll('.color-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                e.target.classList.add('selected');
+            });
         });
 
         // Inicializar la página
@@ -650,8 +728,8 @@
                 swapInstructions.style.display = 'none';
                 cancelSwapBtn.style.display = 'none';
                 
-                // Salir del modo intercambio si estaba activo
-                cancelSwapMode();
+                // Salir del modo reordenamiento si estaba activo
+                cancelReorderMode();
                 
                 // Cargar datos por defecto
                 loadDefaultData();
@@ -778,19 +856,28 @@
                 postElement.className = `blog-item ${post.link ? 'has-link' : ''}`;
                 postElement.setAttribute('data-id', post.id);
                 
+                // Aplicar color de fondo si existe
+                if (post.backgroundColor) {
+                    postElement.style.backgroundColor = post.backgroundColor;
+                }
+                
                 // Si tiene enlace, hacer que sea clickeable
                 if (post.link) {
                     postElement.addEventListener('click', (e) => {
                         // No abrir enlace si se hizo clic en un botón
-                        if (!e.target.closest('.edit-btn, .delete-btn, .reorder-btn')) {
+                        if (!e.target.closest('.edit-btn, .delete-btn, .reorder-btn, .color-btn')) {
                             window.open(post.link, '_blank');
                         }
                     });
                 }
                 
-                // Resaltar si está seleccionado para intercambio
-                if (swapMode && firstSelectedPost && firstSelectedPost.id === post.id) {
-                    postElement.classList.add('selected-for-swap');
+                // Resaltar si está seleccionado para reordenamiento
+                if (reorderMode > 0 && firstSelectedPost && firstSelectedPost.id === post.id) {
+                    if (reorderMode === 1) {
+                        postElement.classList.add('selected-for-swap');
+                    } else if (reorderMode === 2) {
+                        postElement.classList.add('selected-for-insert');
+                    }
                 }
                 
                 postElement.innerHTML = `
@@ -802,9 +889,10 @@
                         ${post.category ? `<span class="blog-category">${post.category}</span>` : ''}
                         ${currentMode === 'personal' ? `
                         <div class="edit-delete-buttons">
+                            <button class="color-btn" data-id="${post.id}" title="Cambiar color">🎨</button>
                             <button class="reorder-btn ${firstSelectedPost && firstSelectedPost.id === post.id ? 'selected' : ''}" 
                                     data-id="${post.id}" 
-                                    title="Intercambiar posición">⎆</button>
+                                    title="Reordenar">⎆</button>
                             <button class="edit-btn" data-id="${post.id}">Editar</button>
                             <button class="delete-btn" data-id="${post.id}">Eliminar</button>
                         </div>
@@ -832,6 +920,15 @@
                     });
                 });
                 
+                // Agregar event listeners a los botones de color
+                document.querySelectorAll('.color-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const postId = e.target.getAttribute('data-id');
+                        openColorModal(postId);
+                    });
+                });
+                
                 // Agregar event listeners a los botones de reordenar
                 document.querySelectorAll('.reorder-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -845,31 +942,48 @@
 
         // Manejar clic en botón de reordenar
         function handleReorderClick(postId) {
-            if (!swapMode) {
+            if (reorderMode === 0) {
                 // Primer clic - activar modo intercambio
                 const post = posts.find(p => p.id === postId);
                 if (post) {
                     firstSelectedPost = post;
-                    swapMode = true;
+                    reorderMode = 1;
                     swapInstructions.style.display = 'block';
                     cancelSwapBtn.style.display = 'inline-block';
+                    swapInstructionText.textContent = 'Modo intercambio: Selecciona una segunda viñeta para intercambiar posiciones';
                     renderPosts();
                     showNotification('Selecciona una segunda viñeta para intercambiar posiciones');
                 }
-            } else {
-                // Segundo clic - completar intercambio
+            } else if (reorderMode === 1) {
+                // Segundo clic - cambiar a modo insertar detrás
                 if (firstSelectedPost.id === postId) {
-                    // Si hace clic en la misma viñeta, cancelar selección
-                    cancelSwapMode();
-                    showNotification('Intercambio cancelado');
+                    reorderMode = 2;
+                    swapInstructionText.textContent = 'Modo insertar: Selecciona una viñeta para mover detrás de ella';
+                    showNotification('Modo cambiado a "insertar detrás". Selecciona una viñeta destino');
                 } else {
                     // Encontrar la segunda viñeta
                     const secondPost = posts.find(p => p.id === postId);
                     if (secondPost) {
                         // Intercambiar posiciones
                         swapPosts(firstSelectedPost, secondPost);
-                        cancelSwapMode();
+                        cancelReorderMode();
                         showNotification('Posiciones intercambiadas correctamente');
+                    }
+                }
+            } else if (reorderMode === 2) {
+                // Tercer clic - insertar detrás o cancelar
+                if (firstSelectedPost.id === postId) {
+                    // Si hace clic en la misma viñeta, cancelar
+                    cancelReorderMode();
+                    showNotification('Reordenamiento cancelado');
+                } else {
+                    // Encontrar la viñeta destino
+                    const targetPost = posts.find(p => p.id === postId);
+                    if (targetPost) {
+                        // Mover la viñeta detrás de la destino
+                        movePostBehind(firstSelectedPost, targetPost);
+                        cancelReorderMode();
+                        showNotification('Viñeta movida correctamente');
                     }
                 }
             }
@@ -890,22 +1004,104 @@
             }
         }
 
-        // Cancelar modo de intercambio
-        function cancelSwapMode() {
-            swapMode = false;
+        // Mover una publicación detrás de otra
+        function movePostBehind(postToMove, targetPost) {
+            const moveIndex = posts.findIndex(p => p.id === postToMove.id);
+            const targetIndex = posts.findIndex(p => p.id === targetPost.id);
+            
+            if (moveIndex !== -1 && targetIndex !== -1) {
+                // Remover la publicación a mover
+                const [movedPost] = posts.splice(moveIndex, 1);
+                
+                // Insertar después del objetivo (si el objetivo está antes en la lista)
+                if (moveIndex > targetIndex) {
+                    posts.splice(targetIndex + 1, 0, movedPost);
+                } else {
+                    posts.splice(targetIndex, 0, movedPost);
+                }
+                
+                // Guardar y renderizar
+                saveData();
+                renderPosts();
+            }
+        }
+
+        // Cancelar modo de reordenamiento
+        function cancelReorderMode() {
+            reorderMode = 0;
             firstSelectedPost = null;
             swapInstructions.style.display = 'none';
             cancelSwapBtn.style.display = 'none';
             renderPosts();
         }
 
+        // Abrir modal para seleccionar color
+        function openColorModal(postId) {
+            if (currentMode !== 'personal') return;
+            
+            // Cancelar modo reordenamiento si está activo
+            if (reorderMode > 0) {
+                cancelReorderMode();
+            }
+            
+            colorEditingPostId = postId;
+            const post = posts.find(p => p.id === postId);
+            
+            // Seleccionar el color actual si existe
+            if (post && post.backgroundColor) {
+                document.querySelectorAll('.color-option').forEach(option => {
+                    if (option.getAttribute('data-color') === post.backgroundColor) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            } else {
+                // Seleccionar blanco por defecto
+                document.querySelectorAll('.color-option').forEach(option => {
+                    if (option.getAttribute('data-color') === '#ffffff') {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            }
+            
+            colorModal.style.display = 'flex';
+        }
+
+        // Cerrar modal de color
+        function closeColorModal() {
+            colorModal.style.display = 'none';
+            colorEditingPostId = null;
+        }
+
+        // Guardar color seleccionado
+        function saveColor() {
+            if (currentMode !== 'personal') return;
+            
+            const selectedColor = document.querySelector('.color-option.selected');
+            if (selectedColor && colorEditingPostId) {
+                const color = selectedColor.getAttribute('data-color');
+                const index = posts.findIndex(post => post.id === colorEditingPostId);
+                
+                if (index !== -1) {
+                    posts[index].backgroundColor = color;
+                    saveData();
+                    renderPosts();
+                    closeColorModal();
+                    showNotification('Color aplicado correctamente');
+                }
+            }
+        }
+
         // Abrir modal para nueva publicación (solo en modo personal)
         function openPostModal(post = null) {
             if (currentMode !== 'personal') return;
             
-            // Cancelar modo intercambio si está activo
-            if (swapMode) {
-                cancelSwapMode();
+            // Cancelar modo reordenamiento si está activo
+            if (reorderMode > 0) {
+                cancelReorderMode();
             }
             
             editingPostId = post ? post.id : null;
@@ -970,7 +1166,8 @@
                     description,
                     link,
                     category,
-                    date: new Date().toISOString()
+                    date: new Date().toISOString(),
+                    backgroundColor: '#ffffff' // Color blanco por defecto
                 };
                 posts.unshift(newPost);
             }
@@ -986,9 +1183,9 @@
         function editPost(postId) {
             if (currentMode !== 'personal') return;
             
-            // Cancelar modo intercambio si está activo
-            if (swapMode) {
-                cancelSwapMode();
+            // Cancelar modo reordenamiento si está activo
+            if (reorderMode > 0) {
+                cancelReorderMode();
             }
             
             const post = posts.find(p => p.id === postId);
@@ -1001,9 +1198,9 @@
         function deletePost(postId) {
             if (currentMode !== 'personal') return;
             
-            // Cancelar modo intercambio si está activo
-            if (swapMode) {
-                cancelSwapMode();
+            // Cancelar modo reordenamiento si está activo
+            if (reorderMode > 0) {
+                cancelReorderMode();
             }
             
             if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
@@ -1018,9 +1215,9 @@
         function openCategoryModal() {
             if (currentMode !== 'personal') return;
             
-            // Cancelar modo intercambio si está activo
-            if (swapMode) {
-                cancelSwapMode();
+            // Cancelar modo reordenamiento si está activo
+            if (reorderMode > 0) {
+                cancelReorderMode();
             }
             
             categoryModal.style.display = 'flex';
@@ -1139,9 +1336,9 @@
         function openFilterModal() {
             if (currentMode !== 'personal') return;
             
-            // Cancelar modo intercambio si está activo
-            if (swapMode) {
-                cancelSwapMode();
+            // Cancelar modo reordenamiento si está activo
+            if (reorderMode > 0) {
+                cancelReorderMode();
             }
             
             updateFilterCategoriesUI();
@@ -1196,9 +1393,9 @@
         function downloadJSON() {
             if (currentMode !== 'personal') return;
             
-            // Cancelar modo intercambio si está activo
-            if (swapMode) {
-                cancelSwapMode();
+            // Cancelar modo reordenamiento si está activo
+            if (reorderMode > 0) {
+                cancelReorderMode();
             }
             
             const data = {
@@ -1242,9 +1439,9 @@
         function loadJSONFromFile(event) {
             if (currentMode !== 'personal') return;
             
-            // Cancelar modo intercambio si está activo
-            if (swapMode) {
-                cancelSwapMode();
+            // Cancelar modo reordenamiento si está activo
+            if (reorderMode > 0) {
+                cancelReorderMode();
             }
             
             const file = event.target.files[0];
