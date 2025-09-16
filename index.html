@@ -292,9 +292,10 @@
             display: flex;
             justify-content: space-between;
             margin-top: 15px;
+            gap: 5px;
         }
         
-        .edit-btn, .delete-btn {
+        .edit-btn, .delete-btn, .reorder-btn {
             padding: 5px 10px;
             font-size: 12px;
         }
@@ -313,6 +314,19 @@
         
         .delete-btn:hover {
             background-color: #c0392b;
+        }
+        
+        .reorder-btn {
+            background-color: #8e44ad;
+        }
+        
+        .reorder-btn:hover {
+            background-color: #9b59b6;
+        }
+        
+        .reorder-btn.selected {
+            background-color: #e67e22;
+            transform: scale(1.1);
         }
         
         .json-viewer {
@@ -366,6 +380,27 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Estilos para el buscador de títulos */
+        .search-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -383,7 +418,11 @@
         <h3>Modo Por Defecto</h3>
         <p>Estás viendo los datos del archivo <strong>pepito.json</strong> almacenado en GitHub.</p>
         <p>En este modo no puedes editar el contenido. Cambia al modo Personal para editar.</p>
+        <div class="search-container">
+            <input type="text" id="default-search" class="search-input" placeholder="Buscar por título...">
+        </div>
         <div class="controls">
+            <button id="default-filter-category-btn">Buscar por categoría</button>
             <button id="download-default-json" class="btn-link">Descargar JSON por Defecto</button>
         </div>
     </div>
@@ -391,7 +430,10 @@
     <div class="info-box" id="personal-info" style="display: none;">
         <h3>Modo Personal</h3>
         <p>Estás viendo y editando tu propio contenido local.</p>
-        <p>Puedes agregar nuevas publicaciones, crear categorías y cargar tus propios datos JSON.</p>
+        <p>Puedes agregar nuevas publicaciones, crear categorías, cargar tus propios datos JSON y reordenar publicaciones.</p>
+        <div class="search-container">
+            <input type="text" id="personal-search" class="search-input" placeholder="Buscar por título...">
+        </div>
     </div>
     
     <div class="controls" id="editing-controls" style="display: none;">
@@ -488,7 +530,10 @@
         let currentFilter = null;
         let editingPostId = null;
         let currentMode = 'default'; // 'default' o 'personal'
-        let defaultData = {}; // Almacenar datos por defecto
+        let defaultData = {};
+        let defaultSearchTerm = '';
+        let personalSearchTerm = '';
+        let firstSelectedPostId = null; // Para el modo de reordenamiento
 
         // Elementos del DOM
         const blogContainer = document.getElementById('blog-container');
@@ -508,6 +553,9 @@
         const personalInfo = document.getElementById('personal-info');
         const jsonSection = document.getElementById('json-section');
         const downloadDefaultJsonBtn = document.getElementById('download-default-json');
+        const defaultSearchInput = document.getElementById('default-search');
+        const personalSearchInput = document.getElementById('personal-search');
+        const defaultFilterCategoryBtn = document.getElementById('default-filter-category-btn');
 
         // Botones de control
         document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
@@ -517,6 +565,7 @@
         document.getElementById('load-json').addEventListener('click', () => jsonFileInput.click());
         jsonFileInput.addEventListener('change', (e) => loadJSONFromFile(e));
         downloadDefaultJsonBtn.addEventListener('click', () => downloadDefaultJSON());
+        defaultFilterCategoryBtn.addEventListener('click', () => openFilterModal());
         
         // Botones de modales
         document.getElementById('cancel-post').addEventListener('click', () => closePostModal());
@@ -526,21 +575,30 @@
         document.getElementById('clear-filter').addEventListener('click', () => clearFilter());
         document.getElementById('close-filter').addEventListener('click', () => closeFilterModal());
 
+        // Buscadores
+        defaultSearchInput.addEventListener('input', (e) => {
+            defaultSearchTerm = e.target.value.trim().toLowerCase();
+            renderPosts();
+        });
+        personalSearchInput.addEventListener('input', (e) => {
+            personalSearchTerm = e.target.value.trim().toLowerCase();
+            renderPosts();
+        });
+
         // Botones de modo
         defaultModeBtn.addEventListener('click', () => switchMode('default'));
         personalModeBtn.addEventListener('click', () => switchMode('personal'));
 
         // Inicializar la página
         function init() {
-            // Cargar datos por defecto primero
             loadDefaultData();
         }
 
         // Cambiar entre modos
         function switchMode(mode) {
             currentMode = mode;
+            firstSelectedPostId = null; // Resetear selección de reordenamiento
             
-            // Actualizar botones de modo
             if (mode === 'default') {
                 defaultModeBtn.classList.add('active');
                 personalModeBtn.classList.remove('active');
@@ -548,8 +606,8 @@
                 defaultInfo.style.display = 'block';
                 personalInfo.style.display = 'none';
                 jsonSection.style.display = 'none';
-                
-                // Cargar datos por defecto
+                defaultSearchInput.value = '';
+                personalSearchTerm = '';
                 loadDefaultData();
             } else {
                 defaultModeBtn.classList.remove('active');
@@ -558,8 +616,8 @@
                 defaultInfo.style.display = 'none';
                 personalInfo.style.display = 'block';
                 jsonSection.style.display = 'block';
-                
-                // Cargar datos personales
+                personalSearchInput.value = '';
+                defaultSearchTerm = '';
                 loadPersonalData();
             }
         }
@@ -571,7 +629,6 @@
                 <p>Esperando datos del archivo pepito.json</p>
             `;
             
-            // Cargar el archivo pepito.json desde GitHub
             fetch('https://raw.githubusercontent.com/papelerio/G/main/pepito.json')
                 .then(response => {
                     if (!response.ok) {
@@ -624,7 +681,14 @@
             
             let filteredPosts = posts;
             if (currentFilter) {
-                filteredPosts = posts.filter(post => post.category === currentFilter);
+                filteredPosts = filteredPosts.filter(post => post.category === currentFilter);
+            }
+            
+            // Filtrar por título según el modo
+            if (currentMode === 'default' && defaultSearchTerm) {
+                filteredPosts = filteredPosts.filter(post => post.title.toLowerCase().startsWith(defaultSearchTerm));
+            } else if (currentMode === 'personal' && personalSearchTerm) {
+                filteredPosts = filteredPosts.filter(post => post.title.toLowerCase().startsWith(personalSearchTerm));
             }
             
             if (filteredPosts.length === 0) {
@@ -633,6 +697,11 @@
                     emptyState.innerHTML = `
                         <h3>No hay publicaciones en la categoría "${currentFilter}"</h3>
                         <p>Intenta con otra categoría o crea una nueva publicación.</p>
+                    `;
+                } else if ((currentMode === 'default' && defaultSearchTerm) || (currentMode === 'personal' && personalSearchTerm)) {
+                    emptyState.innerHTML = `
+                        <h3>No hay publicaciones que coincidan con la búsqueda</h3>
+                        <p>Intenta con otro término de búsqueda.</p>
                     `;
                 } else {
                     emptyState.innerHTML = `
@@ -650,7 +719,6 @@
                 const postElement = document.createElement('div');
                 postElement.className = `blog-item ${post.link ? 'has-link' : ''}`;
                 
-                // Si tiene enlace, hacer que sea clickeable
                 if (post.link) {
                     postElement.addEventListener('click', () => {
                         window.open(post.link, '_blank');
@@ -667,6 +735,7 @@
                         ${currentMode === 'personal' ? `
                         <div class="edit-delete-buttons">
                             <button class="edit-btn" data-id="${post.id}">Editar</button>
+                            <button class="reorder-btn ${post.id === firstSelectedPostId ? 'selected' : ''}" data-id="${post.id}">⎆</button>
                             <button class="delete-btn" data-id="${post.id}">Eliminar</button>
                         </div>
                         ` : ''}
@@ -676,10 +745,9 @@
             });
             
             if (currentMode === 'personal') {
-                // Agregar event listeners a los botones de editar y eliminar
                 document.querySelectorAll('.edit-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Evitar que se active el enlace de la viñeta
+                        e.stopPropagation();
                         const postId = e.target.getAttribute('data-id');
                         editPost(postId);
                     });
@@ -687,15 +755,52 @@
                 
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Evitar que se active el enlace de la viñeta
+                        e.stopPropagation();
                         const postId = e.target.getAttribute('data-id');
                         deletePost(postId);
+                    });
+                });
+                
+                document.querySelectorAll('.reorder-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const postId = e.target.getAttribute('data-id');
+                        handleReorder(postId);
                     });
                 });
             }
         }
 
-        // Abrir modal para nueva publicación (solo en modo personal)
+        // Manejar reordenamiento
+        function handleReorder(postId) {
+            if (currentMode !== 'personal') return;
+            
+            if (!firstSelectedPostId) {
+                // Primer clic: seleccionar la primera viñeta
+                firstSelectedPostId = postId;
+                renderPosts(); // Actualizar para mostrar el botón seleccionado
+                showNotification('Selecciona otra viñeta para intercambiar');
+            } else if (firstSelectedPostId === postId) {
+                // Clic en la misma viñeta: deseleccionar
+                firstSelectedPostId = null;
+                renderPosts();
+                showNotification('Reordenamiento cancelado');
+            } else {
+                // Segundo clic: intercambiar posiciones
+                const index1 = posts.findIndex(post => post.id === firstSelectedPostId);
+                const index2 = posts.findIndex(post => post.id === postId);
+                
+                if (index1 !== -1 && index2 !== -1) {
+                    [posts[index1], posts[index2]] = [posts[index2], posts[index1]];
+                    saveData();
+                    renderPosts();
+                    showNotification('Publicaciones reordenadas correctamente');
+                }
+                firstSelectedPostId = null;
+            }
+        }
+
+        // Abrir modal para nueva publicación
         function openPostModal(post = null) {
             if (currentMode !== 'personal') return;
             
@@ -706,10 +811,8 @@
             document.getElementById('post-description').value = post ? post.description : '';
             document.getElementById('post-link').value = post ? post.link || '' : '';
             
-            // Actualizar categorías disponibles
             updateCategoriesUI();
             
-            // Marcar categoría seleccionada si existe
             if (post && post.category) {
                 const categoryBadge = document.querySelector(`.category-badge[data-category="${post.category}"]`);
                 if (categoryBadge) {
@@ -726,7 +829,7 @@
             editingPostId = null;
         }
 
-        // Guardar publicación (solo en modo personal)
+        // Guardar publicación
         function savePost() {
             if (currentMode !== 'personal') return;
             
@@ -735,12 +838,10 @@
             const description = document.getElementById('post-description').value;
             const link = document.getElementById('post-link').value;
             
-            // Obtener categoría seleccionada
             const selectedCategory = document.querySelector('.category-badge.selected');
             const category = selectedCategory ? selectedCategory.getAttribute('data-category') : '';
             
             if (editingPostId) {
-                // Editar publicación existente
                 const index = posts.findIndex(post => post.id === editingPostId);
                 if (index !== -1) {
                     posts[index] = {
@@ -753,7 +854,6 @@
                     };
                 }
             } else {
-                // Crear nueva publicación
                 const newPost = {
                     id: Date.now().toString(),
                     image,
@@ -766,14 +866,13 @@
                 posts.unshift(newPost);
             }
             
-            // Guardar y actualizar
             saveData();
             renderPosts();
             closePostModal();
             showNotification('¡Publicación guardada correctamente!');
         }
 
-        // Editar publicación (solo en modo personal)
+        // Editar publicación
         function editPost(postId) {
             if (currentMode !== 'personal') return;
             
@@ -783,7 +882,7 @@
             }
         }
 
-        // Eliminar publicación (solo en modo personal)
+        // Eliminar publicación
         function deletePost(postId) {
             if (currentMode !== 'personal') return;
             
@@ -795,7 +894,7 @@
             }
         }
 
-        // Abrir modal para crear categoría (solo en modo personal)
+        // Abrir modal para crear categoría
         function openCategoryModal() {
             if (currentMode !== 'personal') return;
             
@@ -808,7 +907,7 @@
             categoryModal.style.display = 'none';
         }
 
-        // Guardar categoría (solo en modo personal)
+        // Guardar categoría
         function saveCategory() {
             if (currentMode !== 'personal') return;
             
@@ -843,7 +942,6 @@
                 categoriesContainer.appendChild(badge);
             });
             
-            // Actualizar también el modal de filtro
             updateFilterCategoriesUI();
         }
 
@@ -870,19 +968,15 @@
         function toggleCategorySelection(e) {
             if (currentMode !== 'personal') return;
             
-            // Deseleccionar todas las categorías
             document.querySelectorAll('.category-badge').forEach(badge => {
                 badge.classList.remove('selected');
             });
             
-            // Seleccionar la categoría clickeada
             e.target.classList.add('selected');
         }
 
         // Abrir modal de filtro
         function openFilterModal() {
-            if (currentMode !== 'personal') return;
-            
             updateFilterCategoriesUI();
             filterModal.style.display = 'flex';
         }
@@ -906,7 +1000,7 @@
             closeFilterModal();
         }
 
-        // Guardar datos en localStorage (solo en modo personal)
+        // Guardar datos en localStorage
         function saveData() {
             if (currentMode !== 'personal') return;
             
@@ -929,7 +1023,7 @@
             jsonViewer.textContent = JSON.stringify(data, null, 2);
         }
 
-        // Descargar JSON (solo en modo personal)
+        // Descargar JSON
         function downloadJSON() {
             if (currentMode !== 'personal') return;
             
@@ -970,7 +1064,7 @@
             showNotification('JSON por defecto descargado correctamente');
         }
 
-        // Cargar JSON desde archivo (solo en modo personal)
+        // Cargar JSON desde archivo
         function loadJSONFromFile(event) {
             if (currentMode !== 'personal') return;
             
@@ -997,7 +1091,6 @@
             };
             reader.readAsText(file);
             
-            // Limpiar el input
             event.target.value = '';
         }
 
