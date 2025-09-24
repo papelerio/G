@@ -376,28 +376,57 @@
             display: none;
         }
         
-        .color-palette {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
+        .color-picker-container {
             margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .color-option {
+        .favorite-colors {
+            display: flex;
+            overflow-x: auto;
+            gap: 5px;
+            margin-top: 10px;
+            padding-bottom: 5px;
+        }
+        
+        .favorite-color {
             width: 30px;
             height: 30px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
+            position: relative;
             transition: transform 0.2s;
         }
         
-        .color-option:hover {
+        .favorite-color:hover {
             transform: scale(1.1);
         }
         
-        .color-option.selected {
+        .favorite-color.selected {
             border: 2px solid #000;
+        }
+        
+        .remove-favorite {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--accent-color);
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .remove-favorite:hover {
+            background-color: #c0392b;
         }
         
         .json-viewer {
@@ -571,19 +600,16 @@
     <div class="modal" id="color-modal">
         <div class="modal-content">
             <h2>Seleccionar Color de Fondo</h2>
-            <div class="color-palette" id="color-palette">
-                <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
-                <div class="color-option" style="background-color: #ffe6e6;" data-color="#ffe6e6"></div>
-                <div class="color-option" style="background-color: #e6ffe6;" data-color="#e6ffe6"></div>
-                <div class="color-option" style="background-color: #e6e6ff;" data-color="#e6e6ff"></div>
-                <div class="color-option" style="background-color: #ffffe6;" data-color="#ffffe6"></div>
-                <div class="color-option" style="background-color: #e6ffff;" data-color="#e6ffff"></div>
-                <div class="color-option" style="background-color: #ffe6ff;" data-color="#ffe6ff"></div>
-                <div class="color-option" style="background-color: #f0e6ff;" data-color="#f0e6ff"></div>
-                <div class="color-option" style="background-color: #ffe6cc;" data-color="#ffe6cc"></div>
-                <div class="color-option" style="background-color: #e6ccff;" data-color="#e6ccff"></div>
-                <div class="color-option" style="background-color: #ccffcc;" data-color="#ccffcc"></div>
-                <div class="color-option" style="background-color: #ffccff;" data-color="#ffccff"></div>
+            <div class="form-group">
+                <label for="color-picker">Escoge un color</label>
+                <div class="color-picker-container">
+                    <input type="color" id="color-picker" value="#ffffff">
+                    <button id="add-favorite-color" class="btn-success">Favorito</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Colores favoritos</label>
+                <div class="favorite-colors" id="favorite-colors"></div>
             </div>
             <div class="modal-buttons">
                 <button id="cancel-color">Cancelar</button>
@@ -627,6 +653,7 @@
         // Variables globales
         let posts = [];
         let categories = [];
+        let favoriteColors = [];
         let currentFilter = null;
         let editingPostId = null;
         let currentMode = 'default'; // 'default' o 'personal'
@@ -662,7 +689,9 @@
         const swapInstructions = document.getElementById('swap-instructions');
         const swapInstructionText = document.getElementById('swap-instruction-text');
         const cancelSwapBtn = document.getElementById('cancel-swap');
-        const colorPalette = document.getElementById('color-palette');
+        const colorPicker = document.getElementById('color-picker');
+        const addFavoriteColorBtn = document.getElementById('add-favorite-color');
+        const favoriteColorsContainer = document.getElementById('favorite-colors');
 
         // Botones de control
         document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
@@ -676,6 +705,7 @@
         cancelSwapBtn.addEventListener('click', () => cancelReorderMode());
         document.getElementById('cancel-color').addEventListener('click', () => closeColorModal());
         document.getElementById('save-color').addEventListener('click', () => saveColor());
+        addFavoriteColorBtn.addEventListener('click', () => addFavoriteColor());
         
         // Botones de modales
         document.getElementById('cancel-post').addEventListener('click', () => closePostModal());
@@ -695,16 +725,6 @@
         searchInput.addEventListener('input', (e) => {
             currentSearchTerm = e.target.value.toLowerCase();
             renderPosts();
-        });
-
-        // Eventos para la paleta de colores
-        document.querySelectorAll('.color-option').forEach(option => {
-            option.addEventListener('click', (e) => {
-                document.querySelectorAll('.color-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                e.target.classList.add('selected');
-            });
         });
 
         // Inicializar la página
@@ -770,6 +790,7 @@
                     defaultData = data;
                     posts = data.posts || [];
                     categories = data.categories || [];
+                    favoriteColors = data.favoriteColors || [];
                     renderPosts();
                     updateFilterDefaultCategoriesUI();
                 })
@@ -791,14 +812,17 @@
                     const data = JSON.parse(savedData);
                     posts = data.posts || [];
                     categories = data.categories || [];
+                    favoriteColors = data.favoriteColors || [];
                 } catch (e) {
                     console.error("Error parsing saved data:", e);
                     posts = [];
                     categories = [];
+                    favoriteColors = [];
                 }
             } else {
                 posts = [];
                 categories = [];
+                favoriteColors = [];
             }
             
             renderPosts();
@@ -1047,25 +1071,15 @@
             colorEditingPostId = postId;
             const post = posts.find(p => p.id === postId);
             
-            // Seleccionar el color actual si existe
+            // Establecer el color inicial en el color picker
             if (post && post.backgroundColor) {
-                document.querySelectorAll('.color-option').forEach(option => {
-                    if (option.getAttribute('data-color') === post.backgroundColor) {
-                        option.classList.add('selected');
-                    } else {
-                        option.classList.remove('selected');
-                    }
-                });
+                colorPicker.value = post.backgroundColor;
             } else {
-                // Seleccionar blanco por defecto
-                document.querySelectorAll('.color-option').forEach(option => {
-                    if (option.getAttribute('data-color') === '#ffffff') {
-                        option.classList.add('selected');
-                    } else {
-                        option.classList.remove('selected');
-                    }
-                });
+                colorPicker.value = '#ffffff';
             }
+            
+            // Actualizar la paleta de colores favoritos
+            updateFavoriteColorsUI();
             
             colorModal.style.display = 'flex';
         }
@@ -1076,13 +1090,68 @@
             colorEditingPostId = null;
         }
 
+        // Añadir color a favoritos
+        function addFavoriteColor() {
+            const color = colorPicker.value;
+            if (!favoriteColors.includes(color)) {
+                favoriteColors.push(color);
+                saveData();
+                updateFavoriteColorsUI();
+                showNotification('Color añadido a favoritos');
+            } else {
+                showNotification('Este color ya está en favoritos');
+            }
+        }
+
+        // Actualizar la UI de colores favoritos
+        function updateFavoriteColorsUI() {
+            favoriteColorsContainer.innerHTML = '';
+            
+            if (favoriteColors.length === 0) {
+                favoriteColorsContainer.innerHTML = '<p>No hay colores favoritos aún.</p>';
+                return;
+            }
+            
+            favoriteColors.forEach(color => {
+                const colorElement = document.createElement('div');
+                colorElement.className = 'favorite-color';
+                colorElement.style.backgroundColor = color;
+                if (color === colorPicker.value) {
+                    colorElement.classList.add('selected');
+                }
+                
+                const removeBtn = document.createElement('span');
+                removeBtn.className = 'remove-favorite';
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeFavoriteColor(color);
+                });
+                
+                colorElement.addEventListener('click', () => {
+                    colorPicker.value = color;
+                    updateFavoriteColorsUI();
+                });
+                
+                colorElement.appendChild(removeBtn);
+                favoriteColorsContainer.appendChild(colorElement);
+            });
+        }
+
+        // Eliminar color favorito
+        function removeFavoriteColor(color) {
+            favoriteColors = favoriteColors.filter(c => c !== color);
+            saveData();
+            updateFavoriteColorsUI();
+            showNotification('Color eliminado de favoritos');
+        }
+
         // Guardar color seleccionado
         function saveColor() {
             if (currentMode !== 'personal') return;
             
-            const selectedColor = document.querySelector('.color-option.selected');
-            if (selectedColor && colorEditingPostId) {
-                const color = selectedColor.getAttribute('data-color');
+            const color = colorPicker.value;
+            if (colorEditingPostId) {
                 const index = posts.findIndex(post => post.id === colorEditingPostId);
                 
                 if (index !== -1) {
@@ -1372,7 +1441,8 @@
             
             const data = {
                 posts,
-                categories
+                categories,
+                favoriteColors
             };
             
             localStorage.setItem('blogData', JSON.stringify(data));
@@ -1383,7 +1453,8 @@
         function updateJSONView() {
             const data = {
                 posts,
-                categories
+                categories,
+                favoriteColors
             };
             
             jsonViewer.textContent = JSON.stringify(data, null, 2);
@@ -1400,7 +1471,8 @@
             
             const data = {
                 posts,
-                categories
+                categories,
+                favoriteColors
             };
             
             const jsonString = JSON.stringify(data, null, 2);
@@ -1455,6 +1527,7 @@
                     if (data.posts && data.categories) {
                         posts = data.posts;
                         categories = data.categories;
+                        favoriteColors = data.favoriteColors || [];
                         saveData();
                         renderPosts();
                         showNotification('Datos cargados correctamente desde el JSON');
