@@ -1,14 +1,24 @@
 {
   "posts": [
     {
+      "id": "1758730037601",
+      "image": "",
+      "title": "Pag M - menus editos",
+      "description": "",
+      "link": "https://papelerio.github.io/M/",
+      "category": "Mis paginas web",
+      "date": "2025-09-24T16:07:17.601Z",
+      "backgroundColor": "#ff6b90"
+    },
+    {
       "id": "1758729515786",
       "image": "",
       "title": "Pag L - animator",
       "description": "https://raw.githubusercontent.com/papelerio/almacen/refs/heads/main/animator.js",
       "link": "https://papelerio.github.io/L/",
-      "category": "",
+      "category": "Mis paginas web",
       "date": "2025-09-24T15:58:35.786Z",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#8f8fff"
     },
     {
       "id": "1758280400589",
@@ -16,9 +26,9 @@
       "title": "Pag i - PNG transparentes",
       "description": "",
       "link": "https://papelerio.github.io/I/",
-      "category": "",
+      "category": "Mis paginas web",
       "date": "2025-09-19T11:13:20.589Z",
-      "backgroundColor": "#e6e6ff"
+      "backgroundColor": "#8f8fff"
     },
     {
       "id": "1758280378102",
@@ -26,9 +36,9 @@
       "title": "Pag K - collador",
       "description": "k",
       "link": "https://papelerio.github.io/k/",
-      "category": "",
+      "category": "Mis paginas web",
       "date": "2025-09-19T11:12:58.102Z",
-      "backgroundColor": "#e6e6ff"
+      "backgroundColor": "#8f8fff"
     },
     {
       "id": "1757773426530",
@@ -38,7 +48,7 @@
       "link": "https://papelerio.github.io/H/",
       "category": "Mis paginas web",
       "date": "2025-09-13T14:23:46.530Z",
-      "backgroundColor": "#e6e6ff"
+      "backgroundColor": "#fff15c"
     },
     {
       "id": "1757296755153",
@@ -48,27 +58,7 @@
       "link": "https://papelerio.github.io/A/",
       "category": "Mis paginas web",
       "date": "2025-09-08T01:59:15.153Z",
-      "backgroundColor": "#ffccff"
-    },
-    {
-      "id": "1757302988574",
-      "image": "http://imgfz.com/i/eTgALC6.png",
-      "title": "gooogle mapas",
-      "description": "mapas",
-      "link": "https://www.google.com/maps/d/u/0/?hl=es",
-      "category": "Links",
-      "date": "2025-09-08T03:43:08.574Z",
-      "backgroundColor": "#ffccff"
-    },
-    {
-      "id": "1757303040878",
-      "image": "http://imgfz.com/i/fj59eHt.png",
-      "title": "landviewer",
-      "description": "landviewer",
-      "link": "https://eos.com/landviewer/es?lat=-13.61575&lng=-68.97764&z=15&menuItem=search",
-      "category": "Links",
-      "date": "2025-09-08T03:44:00.878Z",
-      "backgroundColor": "#ffccff"
+      "backgroundColor": "#735e73"
     },
     {
       "id": "1757299960611",
@@ -78,27 +68,7 @@
       "link": "https://papelerio.github.io/F/",
       "category": "Mis paginas web",
       "date": "2025-09-08T02:52:40.611Z",
-      "backgroundColor": "#ccffcc"
-    },
-    {
-      "id": "1757298320311",
-      "image": "",
-      "title": "Pag E - reproductor tile map",
-      "description": "papelerio E ",
-      "link": "https://papelerio.github.io/E/",
-      "category": "Mis paginas web",
-      "date": "2025-09-08T02:25:20.311Z",
-      "backgroundColor": "#ccffcc"
-    },
-    {
-      "id": "1757298243310",
-      "image": "",
-      "title": "Pag D - Tile map",
-      "description": "Potencial de JSON",
-      "link": "https://papelerio.github.io/D/",
-      "category": "Mis paginas web",
-      "date": "2025-09-08T02:24:03.310Z",
-      "backgroundColor": "#ccffcc"
+      "backgroundColor": "#5cff5c"
     },
     {
       "id": "1757298186350",
@@ -108,7 +78,27 @@
       "link": "https://papelerio.github.io/C/",
       "category": "Mis paginas web",
       "date": "2025-09-08T02:23:06.350Z",
-      "backgroundColor": "#ccffcc"
+      "backgroundColor": "#5cff5c"
+    },
+    {
+      "id": "1757298320311",
+      "image": "",
+      "title": "Pag E - reproductor tile map",
+      "description": "papelerio E ",
+      "link": "https://papelerio.github.io/E/",
+      "category": "Mis paginas web",
+      "date": "2025-09-08T02:25:20.311Z",
+      "backgroundColor": "#ffbe4d"
+    },
+    {
+      "id": "1757298243310",
+      "image": "",
+      "title": "Pag D - Tile map",
+      "description": "Potencial de JSON",
+      "link": "https://papelerio.github.io/D/",
+      "category": "Mis paginas web",
+      "date": "2025-09-08T02:24:03.310Z",
+      "backgroundColor": "#ffbe4d"
     },
     {
       "id": "1757298146063",
@@ -118,7 +108,27 @@
       "link": "https://papelerio.github.io/B/",
       "category": "Mis paginas web",
       "date": "2025-09-08T02:22:26.063Z",
-      "backgroundColor": "#e6ccff"
+      "backgroundColor": "#c180ff"
+    },
+    {
+      "id": "1757302988574",
+      "image": "http://imgfz.com/i/eTgALC6.png",
+      "title": "gooogle mapas",
+      "description": "mapas",
+      "link": "https://www.google.com/maps/d/u/0/?hl=es",
+      "category": "Links",
+      "date": "2025-09-08T03:43:08.574Z",
+      "backgroundColor": "#a3e3ff"
+    },
+    {
+      "id": "1757303040878",
+      "image": "http://imgfz.com/i/fj59eHt.png",
+      "title": "landviewer",
+      "description": "landviewer",
+      "link": "https://eos.com/landviewer/es?lat=-13.61575&lng=-68.97764&z=15&menuItem=search",
+      "category": "Links",
+      "date": "2025-09-08T03:44:00.878Z",
+      "backgroundColor": "#a3e3ff"
     },
     {
       "id": "1758047237506",
@@ -128,7 +138,7 @@
       "link": "https://es.imgbb.com/",
       "category": "Links",
       "date": "2025-09-16T18:27:17.506Z",
-      "backgroundColor": "#ffccff"
+      "backgroundColor": "#a3e3ff"
     },
     {
       "id": "1757296269633",
@@ -138,7 +148,7 @@
       "link": "https://imgfz.com/es/",
       "category": "Links",
       "date": "2025-09-08T01:51:09.633Z",
-      "backgroundColor": "#ffccff"
+      "backgroundColor": "#a3e3ff"
     },
     {
       "id": "1757296870521",
@@ -148,12 +158,22 @@
       "link": "https://github.com/dashboard",
       "category": "Links",
       "date": "2025-09-08T02:01:10.521Z",
-      "backgroundColor": "#ffccff"
+      "backgroundColor": "#a3e3ff"
     }
   ],
   "categories": [
     "Links",
     "Mis paginas web",
     "XD"
+  ],
+  "favoriteColors": [
+    "#ff6b90",
+    "#fff15c",
+    "#735e73",
+    "#a3e3ff",
+    "#5cff5c",
+    "#c180ff",
+    "#ffbe4d",
+    "#8f8fff"
   ]
 }
