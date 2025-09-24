@@ -2,7 +2,7 @@
   "posts": [
     {
       "id": "1758730037601",
-      "image": "",
+      "image": "https://i.ibb.co/5X4x48SJ/Shot-1233.png",
       "title": "Pag M - menus editos",
       "description": "",
       "link": "https://papelerio.github.io/M/",
@@ -12,7 +12,7 @@
     },
     {
       "id": "1758729515786",
-      "image": "",
+      "image": "https://i.ibb.co/zvzRSyg/Shot-1232.png",
       "title": "Pag L - animator",
       "description": "https://raw.githubusercontent.com/papelerio/almacen/refs/heads/main/animator.js",
       "link": "https://papelerio.github.io/L/",
@@ -22,7 +22,7 @@
     },
     {
       "id": "1758280400589",
-      "image": "",
+      "image": "https://i.ibb.co/TB07K0WB/Shot-1227.png",
       "title": "Pag i - PNG transparentes",
       "description": "",
       "link": "https://papelerio.github.io/I/",
@@ -32,7 +32,7 @@
     },
     {
       "id": "1758280378102",
-      "image": "",
+      "image": "https://i.ibb.co/C5SPHsKr/Shot-1231.png",
       "title": "Pag K - collador",
       "description": "k",
       "link": "https://papelerio.github.io/k/",
@@ -82,7 +82,7 @@
     },
     {
       "id": "1757298320311",
-      "image": "",
+      "image": "https://i.ibb.co/7xGqQyZv/Shot-1230.png",
       "title": "Pag E - reproductor tile map",
       "description": "papelerio E ",
       "link": "https://papelerio.github.io/E/",
@@ -92,7 +92,7 @@
     },
     {
       "id": "1757298243310",
-      "image": "",
+      "image": "https://i.ibb.co/LzmrJtRV/Shot-1229.png",
       "title": "Pag D - Tile map",
       "description": "Potencial de JSON",
       "link": "https://papelerio.github.io/D/",
@@ -132,7 +132,7 @@
     },
     {
       "id": "1758047237506",
-      "image": "",
+      "image": "https://i.ibb.co/BV1TT8HT/Shot-1228.png",
       "title": "almacenador de imagenes 2",
       "description": "perfecto para iconos de web",
       "link": "https://es.imgbb.com/",
