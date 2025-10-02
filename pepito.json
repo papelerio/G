@@ -6,7 +6,7 @@
       "title": "MEGA JUEGO",
       "description": "",
       "link": "https://papelerio.github.io/almacen/",
-      "category": "",
+      "category": "Mis paginas web",
       "date": "2025-09-26T02:26:16.567Z",
       "backgroundColor": "#5cff5c"
     },
@@ -16,7 +16,7 @@
       "title": "Pag O - MUSICAS JSON",
       "description": "",
       "link": "https://papelerio.github.io/O/",
-      "category": "",
+      "category": "Mis paginas web",
       "date": "2025-09-29T14:05:35.849Z",
       "backgroundColor": "#ff6b90"
     },
@@ -78,6 +78,16 @@
       "link": "https://papelerio.github.io/H/",
       "category": "Mis paginas web",
       "date": "2025-09-13T14:23:46.530Z",
+      "backgroundColor": "#fff15c"
+    },
+    {
+      "id": "1759442688042",
+      "image": "",
+      "title": "Pag Q - editor 3D",
+      "description": "Editor 3d (.obj)",
+      "link": "https://papelerio.github.io/Q/",
+      "category": "Mis paginas web",
+      "date": "2025-10-02T22:04:48.042Z",
       "backgroundColor": "#fff15c"
     },
     {
