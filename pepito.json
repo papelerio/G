@@ -73,7 +73,7 @@
     {
       "id": "1757773426530",
       "image": "http://imgfz.com/i/3CNZl1R.png",
-      "title": "dibuja poligonos",
+      "title": "Pag H - dibuja poligonos",
       "description": "H",
       "link": "https://papelerio.github.io/H/",
       "category": "Mis paginas web",
@@ -82,7 +82,7 @@
     },
     {
       "id": "1759442688042",
-      "image": "",
+      "image": "https://64.media.tumblr.com/b9c47e740aea02648515288103e5ea13/e43831ac58655b84-60/s250x400/f10e03a23f24a03835c074818fa73eb616cdd9e8.gifv",
       "title": "Pag Q - editor 3D",
       "description": "Editor 3d (.obj)",
       "link": "https://papelerio.github.io/Q/",
@@ -92,7 +92,7 @@
     },
     {
       "id": "1759192408028",
-      "image": "",
+      "image": "https://64.media.tumblr.com/cddaaf988160f3f6b695785ca1378f70/e82fbc89fda0ccc7-b3/s64x64u_c1/d2b9e96fe70b67598cb72bc36a83ea2e4c0460b4.jpg",
       "title": "Pag P - cronometro",
       "description": "",
       "link": "https://papelerio.github.io/P/",
@@ -186,7 +186,7 @@
       "title": "almacenador de imagenes 2",
       "description": "perfecto para iconos de web",
       "link": "https://es.imgbb.com/",
-      "category": "Links",
+      "category": "almacen",
       "date": "2025-09-16T18:27:17.506Z",
       "backgroundColor": "#a3e3ff"
     },
@@ -196,7 +196,7 @@
       "title": "Almacenardor imagenes gratis",
       "description": "es gratis y ya we",
       "link": "https://imgfz.com/es/",
-      "category": "Links",
+      "category": "almacen",
       "date": "2025-09-08T01:51:09.633Z",
       "backgroundColor": "#a3e3ff"
     },
@@ -209,12 +209,34 @@
       "category": "Links",
       "date": "2025-09-08T02:01:10.521Z",
       "backgroundColor": "#a3e3ff"
+    },
+    {
+      "id": "1759876090365",
+      "image": "https://s-ul.eu/img/icon.png?1674611181",
+      "title": "almacen S-ul",
+      "description": "drive pero para html",
+      "link": "https://s-ul.eu/files",
+      "category": "almacen",
+      "date": "2025-10-07T22:28:10.366Z",
+      "backgroundColor": "#430a61"
+    },
+    {
+      "id": "1759877171476",
+      "image": "https://i.ibb.co/n8V2FLZ9/Image.png",
+      "title": "coordenada",
+      "description": "pag",
+      "link": "https://i.ibb.co/n8V2FLZ9/Image.png",
+      "category": "imagen",
+      "date": "2025-10-07T22:46:11.476Z",
+      "backgroundColor": "#ab6830"
     }
   ],
   "categories": [
     "Links",
     "Mis paginas web",
-    "XD"
+    "XD",
+    "imagen",
+    "almacen"
   ],
   "favoriteColors": [
     "#ff6b90",
@@ -224,6 +246,7 @@
     "#5cff5c",
     "#c180ff",
     "#ffbe4d",
-    "#8f8fff"
+    "#8f8fff",
+    "#ab6830"
   ]
 }
