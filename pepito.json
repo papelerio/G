@@ -231,6 +231,16 @@
       "backgroundColor": "#a3e3ff"
     },
     {
+      "id": "1760377252653",
+      "image": "https://www.gstatic.com/mobilesdk/240501_mobilesdk/firebase_color_ios_61in76dp.png",
+      "title": "Firebase",
+      "description": "wtf",
+      "link": "https://console.firebase.google.com/u/4/",
+      "category": "almacen",
+      "date": "2025-10-13T17:40:52.653Z",
+      "backgroundColor": "#ffbe4d"
+    },
+    {
       "id": "1759876090365",
       "image": "https://s-ul.eu/img/icon.png?1674611181",
       "title": "almacen S-ul",
