@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Blog - Dos Modos de Visualización</title>
+    <title>Mi Blog</title>
     <link rel="icon" href="https://64.media.tumblr.com/8f876dcfa0afe4f09e06719a7a04ed60/2448006a566ecc5e-db/s1280x1920/7ca841d996d2b8030b7c725e5da350f635da0a89.png" type="image/png">
     <style>
         :root {
@@ -16,21 +16,22 @@
             --warning-color: #f39c12;
             --link-color: #ffeb3b;
         }
-        
+       
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+       
         body {
             background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
             padding: 20px;
+            position: relative;
         }
-        
+       
         header {
             text-align: center;
             margin-bottom: 30px;
@@ -39,18 +40,27 @@
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
+       
         h1 {
             color: var(--secondary-color);
             margin-bottom: 10px;
         }
-        
+       
+        .top-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+       
         .search-container {
             margin: 20px 0;
             display: flex;
             justify-content: center;
         }
-        
+       
         .search-input {
             padding: 12px 20px;
             width: 100%;
@@ -61,36 +71,11 @@
             outline: none;
             transition: border-color 0.3s;
         }
-        
+       
         .search-input:focus {
             border-color: var(--primary-color);
         }
-        
-        .mode-selector {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-        }
-        
-        .mode-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--primary-color);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        
-        .mode-btn.active {
-            background-color: var(--secondary-color);
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
+       
         .controls {
             display: flex;
             justify-content: center;
@@ -98,7 +83,7 @@
             margin-bottom: 30px;
             flex-wrap: wrap;
         }
-        
+       
         button {
             padding: 10px 20px;
             border: none;
@@ -108,61 +93,52 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        
+       
         button:hover {
             background-color: var(--secondary-color);
         }
-        
+       
         .btn-success {
             background-color: var(--success-color);
         }
-        
+       
         .btn-success:hover {
             background-color: #27ae60;
         }
-        
+       
         .btn-warning {
             background-color: var(--warning-color);
         }
-        
+       
         .btn-warning:hover {
             background-color: #e67e22;
         }
-        
-        .btn-link {
-            background-color: var(--link-color);
-            color: #333;
-        }
-        
-        .btn-link:hover {
-            background-color: #ffc107;
-        }
-        
+       
         .blog-container {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 20px;
             margin-bottom: 30px;
         }
-        
+       
         @media (max-width: 1200px) {
             .blog-container {
                 grid-template-columns: repeat(4, 1fr);
             }
         }
-        
+       
         @media (max-width: 900px) {
             .blog-container {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        
+       
         @media (max-width: 600px) {
             .blog-container {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-        
+       
         .blog-item {
             background-color: white;
             border-radius: 10px;
@@ -171,53 +147,53 @@
             transition: transform 0.3s;
             position: relative;
         }
-        
+       
         .blog-item.has-link {
             border: 3px solid var(--link-color);
             cursor: pointer;
         }
-        
+       
         .blog-item.has-link:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
+       
         .blog-item:hover {
             transform: translateY(-5px);
         }
-        
+       
         .blog-item.selected-for-swap {
             border: 3px solid var(--warning-color);
             box-shadow: 0 0 15px var(--warning-color);
         }
-        
+       
         .blog-item.selected-for-insert {
             border: 3px solid var(--success-color);
             box-shadow: 0 0 15px var(--success-color);
         }
-        
+       
         .blog-image {
             width: 100%;
             height: 150px;
             object-fit: cover;
         }
-        
+       
         .blog-content {
             padding: 15px;
         }
-        
+       
         .blog-title {
             font-size: 18px;
             margin-bottom: 10px;
             color: var(--secondary-color);
         }
-        
+       
         .blog-description {
             font-size: 14px;
             color: #7f8c8d;
             margin-bottom: 10px;
         }
-        
+       
         .blog-category {
             display: inline-block;
             background-color: var(--accent-color);
@@ -226,7 +202,7 @@
             border-radius: 15px;
             font-size: 12px;
         }
-        
+       
         .blog-link-indicator {
             position: absolute;
             top: 10px;
@@ -238,7 +214,7 @@
             font-size: 12px;
             font-weight: bold;
         }
-        
+       
         .modal {
             display: none;
             position: fixed;
@@ -251,7 +227,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+       
         .modal-content {
             background-color: white;
             padding: 30px;
@@ -262,22 +238,22 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        
+       
         .modal h2 {
             margin-bottom: 20px;
             color: var(--secondary-color);
         }
-        
+       
         .form-group {
             margin-bottom: 15px;
         }
-        
+       
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-        
+       
         input, textarea, select {
             width: 100%;
             padding: 10px;
@@ -285,19 +261,19 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        
+       
         textarea {
             min-height: 100px;
             resize: vertical;
         }
-        
+       
         .modal-buttons {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
             margin-top: 20px;
         }
-        
+       
         .category-badge {
             display: inline-block;
             background-color: var(--primary-color);
@@ -307,65 +283,65 @@
             margin: 5px;
             cursor: pointer;
         }
-        
+       
         .category-badge.selected {
             background-color: var(--secondary-color);
         }
-        
+       
         .empty-state {
             text-align: center;
             padding: 40px;
             color: #7f8c8d;
             grid-column: 1 / -1;
         }
-        
+       
         .edit-delete-buttons {
             display: flex;
             justify-content: space-between;
             margin-top: 15px;
         }
-        
+       
         .edit-btn, .delete-btn, .reorder-btn, .color-btn {
             padding: 5px 10px;
             font-size: 12px;
         }
-        
+       
         .edit-btn {
             background-color: var(--success-color);
         }
-        
+       
         .edit-btn:hover {
             background-color: #27ae60;
         }
-        
+       
         .delete-btn {
             background-color: var(--accent-color);
         }
-        
+       
         .delete-btn:hover {
             background-color: #c0392b;
         }
-        
+       
         .reorder-btn {
             background-color: var(--warning-color);
         }
-        
+       
         .reorder-btn:hover {
             background-color: #e67e22;
         }
-        
+       
         .reorder-btn.selected {
             background-color: var(--secondary-color);
         }
-        
+       
         .color-btn {
             background-color: #9b59b6;
         }
-        
+       
         .color-btn:hover {
             background-color: #8e44ad;
         }
-        
+       
         .swap-instructions {
             text-align: center;
             padding: 10px;
@@ -375,14 +351,14 @@
             font-size: 14px;
             display: none;
         }
-        
+       
         .color-picker-container {
             margin-top: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+       
         .favorite-colors {
             display: flex;
             overflow-x: auto;
@@ -390,7 +366,7 @@
             margin-top: 10px;
             padding-bottom: 5px;
         }
-        
+       
         .favorite-color {
             width: 30px;
             height: 30px;
@@ -400,15 +376,15 @@
             position: relative;
             transition: transform 0.2s;
         }
-        
+       
         .favorite-color:hover {
             transform: scale(1.1);
         }
-        
+       
         .favorite-color.selected {
             border: 2px solid #000;
         }
-        
+       
         .remove-favorite {
             position: absolute;
             top: -5px;
@@ -424,23 +400,11 @@
             font-size: 10px;
             cursor: pointer;
         }
-        
+       
         .remove-favorite:hover {
             background-color: #c0392b;
         }
-        
-        .json-viewer {
-            background-color: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 20px;
-        }
-        
+       
         .notification {
             position: fixed;
             top: 20px;
@@ -454,11 +418,11 @@
             transition: transform 0.3s ease;
             z-index: 2000;
         }
-        
+       
         .notification.show {
             transform: translateX(0);
         }
-        
+       
         .info-box {
             background-color: var(--light-color);
             padding: 15px;
@@ -466,7 +430,7 @@
             margin: 20px 0;
             font-size: 14px;
         }
-        
+       
         .loading {
             display: inline-block;
             width: 20px;
@@ -476,11 +440,11 @@
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
         }
-        
+       
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
+       
         .filter-controls {
             display: flex;
             justify-content: center;
@@ -492,64 +456,37 @@
 </head>
 <body>
     <header>
-        <h1>Mi Blog - Dos Modos de Visualización</h1>
-        <p>Selecciona entre el modo por defecto (lee de pepito.json) o modo personal (editable)</p>
-        
+        <h1>Mi Blog</h1>
+       
         <div class="search-container">
             <input type="text" id="search-input" class="search-input" placeholder="Buscar por título...">
         </div>
-        
-        <div class="mode-selector">
-            <button id="default-mode" class="mode-btn active">Por Defecto</button>
-            <button id="personal-mode" class="mode-btn">Personal</button>
-        </div>
     </header>
-    
-    <div class="info-box" id="default-info">
-        <h3>Modo Por Defecto</h3>
-        <p>Estás viendo los datos del archivo <strong>pepito.json</strong> almacenado en GitHub.</p>
-        <p>En este modo no puedes editar el contenido. Cambia al modo Personal para editar.</p>
-        <div class="filter-controls">
-            <button id="filter-category-default-btn">Filtrar por categoría</button>
-        </div>
-        <div class="controls">
-            <button id="download-default-json" class="btn-link">Descargar JSON por Defecto</button>
-        </div>
+   
+    <div class="top-controls">
+        <button id="verify-admin-btn">Verificar admin</button>
+        <button id="load-data-btn">Cargar datos</button>
+        <button id="upload-firebase-btn" style="display: none;">Subir a Firebase</button>
     </div>
-    
-    <div class="info-box" id="personal-info" style="display: none;">
-        <h3>Modo Personal</h3>
-        <p>Estás viendo y editando tu propio contenido local.</p>
-        <p>Puedes agregar nuevas publicaciones, crear categorías y cargar tus propios datos JSON.</p>
-    </div>
-    
+   
     <div class="controls" id="editing-controls" style="display: none;">
         <button id="add-post-btn">Agregar nueva viñeta</button>
         <button id="add-category-btn">Crear nueva categoría</button>
         <button id="filter-category-btn">Buscar por categoría</button>
-        <button id="download-json" class="btn-success">Descargar JSON Personal</button>
-        <button id="load-json" class="btn-warning">Cargar desde JSON</button>
         <button id="cancel-swap" style="display: none;">Cancelar reordenamiento</button>
     </div>
-    
+   
     <div class="swap-instructions" id="swap-instructions">
         <p id="swap-instruction-text">Modo intercambio: Selecciona una segunda viñeta para intercambiar posiciones</p>
     </div>
-    
+   
     <div class="blog-container" id="blog-container">
         <div class="empty-state" id="empty-state">
-            <h3>Cargando contenido...</h3>
-            <p>Esperando datos del archivo pepito.json</p>
+            <h3>No hay publicaciones aún</h3>
+            <p>Presiona "Cargar datos" para obtener el contenido.</p>
         </div>
     </div>
-    
-    <div id="json-section" style="display: none;">
-        <h3>Vista previa del JSON Personal</h3>
-        <div class="json-viewer" id="json-viewer">
-            {/* El contenido JSON se mostrará aquí */}
-        </div>
-    </div>
-    
+   
     <!-- Modal para agregar/editar publicación -->
     <div class="modal" id="post-modal">
         <div class="modal-content">
@@ -580,7 +517,7 @@
             </div>
         </div>
     </div>
-    
+   
     <!-- Modal para crear categoría -->
     <div class="modal" id="category-modal">
         <div class="modal-content">
@@ -595,7 +532,7 @@
             </div>
         </div>
     </div>
-    
+   
     <!-- Modal para seleccionar color -->
     <div class="modal" id="color-modal">
         <div class="modal-content">
@@ -617,7 +554,7 @@
             </div>
         </div>
     </div>
-    
+   
     <!-- Modal para filtrar por categoría -->
     <div class="modal" id="filter-modal">
         <div class="modal-content">
@@ -629,40 +566,55 @@
             </div>
         </div>
     </div>
-    
-    <!-- Modal para filtrar por categoría (modo por defecto) -->
-    <div class="modal" id="filter-default-modal">
+   
+    <!-- Modal para verificar admin -->
+    <div class="modal" id="admin-modal">
         <div class="modal-content">
-            <h2>Filtrar por Categoría (Modo Por Defecto)</h2>
-            <div id="filter-default-categories-container"></div>
+            <h2>Verificar Administrador</h2>
+            <div class="form-group">
+                <label for="admin-password">Contraseña</label>
+                <input type="password" id="admin-password" placeholder="Ingresa la contraseña">
+            </div>
             <div class="modal-buttons">
-                <button id="clear-default-filter">Mostrar Todas</button>
-                <button id="close-default-filter">Cerrar</button>
+                <button id="cancel-admin">Cancelar</button>
+                <button id="verify-admin-submit">Verificar</button>
             </div>
         </div>
     </div>
-    
-    <!-- Input oculto para cargar JSON -->
-    <input type="file" id="json-file-input" accept=".json" style="display: none;">
-    
+   
     <div class="notification" id="notification">
-        ¡JSON actualizado correctamente!
+        ¡Operación completada!
     </div>
-
-    <script>
+    <script type="module">
+        // Firebase imports and init
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSyA3fUC0W16D-xQxk-NRyX-Hl5uhkg_wO3c",
+          authDomain: "repositoia.firebaseapp.com",
+          databaseURL: "https://repositoia-default-rtdb.firebaseio.com",
+          projectId: "repositoia",
+          storageBucket: "repositoia.firebasestorage.app",
+          messagingSenderId: "180873573579",
+          appId: "1:180873573579:web:fb93deff0e28e53f77d74e"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
         // Variables globales
         let posts = [];
         let categories = [];
         let favoriteColors = [];
         let currentFilter = null;
         let editingPostId = null;
-        let currentMode = 'default'; // 'default' o 'personal'
-        let defaultData = {}; // Almacenar datos por defecto
+        let isAdmin = false;
         let currentSearchTerm = '';
         let reorderMode = 0; // 0: inactivo, 1: intercambiar, 2: mover detrás
         let firstSelectedPost = null;
         let colorEditingPostId = null;
-
+        
         // Elementos del DOM
         const blogContainer = document.getElementById('blog-container');
         const emptyState = document.getElementById('empty-state');
@@ -670,43 +622,33 @@
         const categoryModal = document.getElementById('category-modal');
         const colorModal = document.getElementById('color-modal');
         const filterModal = document.getElementById('filter-modal');
-        const filterDefaultModal = document.getElementById('filter-default-modal');
+        const adminModal = document.getElementById('admin-modal');
         const categoriesContainer = document.getElementById('categories-container');
         const filterCategoriesContainer = document.getElementById('filter-categories-container');
-        const filterDefaultCategoriesContainer = document.getElementById('filter-default-categories-container');
-        const jsonViewer = document.getElementById('json-viewer');
-        const jsonFileInput = document.getElementById('json-file-input');
         const notification = document.getElementById('notification');
-        const defaultModeBtn = document.getElementById('default-mode');
-        const personalModeBtn = document.getElementById('personal-mode');
-        const editingControls = document.getElementById('editing-controls');
-        const defaultInfo = document.getElementById('default-info');
-        const personalInfo = document.getElementById('personal-info');
-        const jsonSection = document.getElementById('json-section');
-        const downloadDefaultJsonBtn = document.getElementById('download-default-json');
         const searchInput = document.getElementById('search-input');
-        const filterCategoryDefaultBtn = document.getElementById('filter-category-default-btn');
         const swapInstructions = document.getElementById('swap-instructions');
         const swapInstructionText = document.getElementById('swap-instruction-text');
         const cancelSwapBtn = document.getElementById('cancel-swap');
         const colorPicker = document.getElementById('color-picker');
         const addFavoriteColorBtn = document.getElementById('add-favorite-color');
         const favoriteColorsContainer = document.getElementById('favorite-colors');
-
+        const editingControls = document.getElementById('editing-controls');
+        
         // Botones de control
-        document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
-        document.getElementById('add-category-btn').addEventListener('click', () => openCategoryModal());
-        document.getElementById('filter-category-btn').addEventListener('click', () => openFilterModal());
-        document.getElementById('download-json').addEventListener('click', () => downloadJSON());
-        document.getElementById('load-json').addEventListener('click', () => jsonFileInput.click());
-        jsonFileInput.addEventListener('change', (e) => loadJSONFromFile(e));
-        downloadDefaultJsonBtn.addEventListener('click', () => downloadDefaultJSON());
-        filterCategoryDefaultBtn.addEventListener('click', () => openFilterDefaultModal());
+        if (document.getElementById('add-post-btn')) document.getElementById('add-post-btn').addEventListener('click', () => openPostModal());
+        if (document.getElementById('add-category-btn')) document.getElementById('add-category-btn').addEventListener('click', () => openCategoryModal());
+        if (document.getElementById('filter-category-btn')) document.getElementById('filter-category-btn').addEventListener('click', () => openFilterModal());
+        document.getElementById('load-data-btn').addEventListener('click', loadFromFirebase);
+        document.getElementById('upload-firebase-btn').addEventListener('click', uploadToFirebase);
+        document.getElementById('verify-admin-btn').addEventListener('click', openAdminModal);
         cancelSwapBtn.addEventListener('click', () => cancelReorderMode());
         document.getElementById('cancel-color').addEventListener('click', () => closeColorModal());
         document.getElementById('save-color').addEventListener('click', () => saveColor());
         addFavoriteColorBtn.addEventListener('click', () => addFavoriteColor());
-        
+        document.getElementById('cancel-admin').addEventListener('click', closeAdminModal);
+        document.getElementById('verify-admin-submit').addEventListener('click', verifyAdmin);
+       
         // Botones de modales
         document.getElementById('cancel-post').addEventListener('click', () => closePostModal());
         document.getElementById('save-post').addEventListener('click', () => savePost());
@@ -714,98 +656,20 @@
         document.getElementById('save-category').addEventListener('click', () => saveCategory());
         document.getElementById('clear-filter').addEventListener('click', () => clearFilter());
         document.getElementById('close-filter').addEventListener('click', () => closeFilterModal());
-        document.getElementById('clear-default-filter').addEventListener('click', () => clearFilter());
-        document.getElementById('close-default-filter').addEventListener('click', () => closeFilterDefaultModal());
-
-        // Botones de modo
-        defaultModeBtn.addEventListener('click', () => switchMode('default'));
-        personalModeBtn.addEventListener('click', () => switchMode('personal'));
-
+       
         // Evento de búsqueda
         searchInput.addEventListener('input', (e) => {
             currentSearchTerm = e.target.value.toLowerCase();
             renderPosts();
         });
-
+       
         // Inicializar la página
         function init() {
-            // Cargar datos por defecto primero
-            loadDefaultData();
+            loadLocalData();
         }
-
-        // Cambiar entre modos
-        function switchMode(mode) {
-            currentMode = mode;
-            
-            // Actualizar botones de modo
-            if (mode === 'default') {
-                defaultModeBtn.classList.add('active');
-                personalModeBtn.classList.remove('active');
-                editingControls.style.display = 'none';
-                defaultInfo.style.display = 'block';
-                personalInfo.style.display = 'none';
-                jsonSection.style.display = 'none';
-                swapInstructions.style.display = 'none';
-                cancelSwapBtn.style.display = 'none';
-                
-                // Salir del modo reordenamiento si estaba activo
-                cancelReorderMode();
-                
-                // Cargar datos por defecto
-                loadDefaultData();
-            } else {
-                defaultModeBtn.classList.remove('active');
-                personalModeBtn.classList.add('active');
-                editingControls.style.display = 'flex';
-                defaultInfo.style.display = 'none';
-                personalInfo.style.display = 'block';
-                jsonSection.style.display = 'block';
-                
-                // Cargar datos personales
-                loadPersonalData();
-            }
-            
-            // Reiniciar búsqueda y filtros
-            currentSearchTerm = '';
-            searchInput.value = '';
-            currentFilter = null;
-        }
-
-        // Cargar datos por defecto desde pepito.json
-        function loadDefaultData() {
-            emptyState.innerHTML = `
-                <h3>Cargando contenido...</h3>
-                <p>Esperando datos del archivo pepito.json</p>
-            `;
-            
-            // Cargar el archivo pepito.json desde GitHub
-            fetch('https://raw.githubusercontent.com/papelerio/G/main/pepito.json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('No se pudo cargar el archivo pepito.json');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    defaultData = data;
-                    posts = data.posts || [];
-                    categories = data.categories || [];
-                    favoriteColors = data.favoriteColors || [];
-                    renderPosts();
-                    updateFilterDefaultCategoriesUI();
-                })
-                .catch(error => {
-                    console.error('Error cargando pepito.json:', error);
-                    emptyState.innerHTML = `
-                        <h3>Error cargando los datos</h3>
-                        <p>No se pudo cargar el archivo pepito.json</p>
-                        <p>${error.message}</p>
-                    `;
-                });
-        }
-
-        // Cargar datos personales desde localStorage
-        function loadPersonalData() {
+       
+        // Cargar datos locales desde localStorage
+        function loadLocalData() {
             const savedData = localStorage.getItem('blogData');
             if (savedData) {
                 try {
@@ -824,30 +688,89 @@
                 categories = [];
                 favoriteColors = [];
             }
-            
+           
             renderPosts();
             updateCategoriesUI();
-            updateJSONView();
         }
-
+       
+        // Cargar datos desde Firebase y guardar en localStorage
+        async function loadFromFirebase() {
+            try {
+                const snapshot = await get(ref(db, '/'));
+                const data = snapshot.val();
+                if (data) {
+                    localStorage.setItem('blogData', JSON.stringify(data));
+                    loadLocalData();
+                    showNotification('Datos cargados desde Firebase');
+                } else {
+                    showNotification('No hay datos en Firebase');
+                }
+            } catch (error) {
+                console.error('Error loading from Firebase:', error);
+                showNotification('Error al cargar desde Firebase');
+            }
+        }
+       
+        // Subir datos a Firebase
+        async function uploadToFirebase() {
+            if (!isAdmin) return;
+            const data = {
+                posts,
+                categories,
+                favoriteColors
+            };
+            try {
+                await set(ref(db, '/'), data);
+                showNotification('Datos subidos a Firebase correctamente');
+            } catch (error) {
+                console.error('Error uploading to Firebase:', error);
+                showNotification('Error al subir a Firebase');
+            }
+        }
+       
+        // Verificar admin
+        function verifyAdmin() {
+            const pw = document.getElementById('admin-password').value;
+            if (pw === 'oriente14') {
+                isAdmin = true;
+                closeAdminModal();
+                document.getElementById('upload-firebase-btn').style.display = 'inline-block';
+                editingControls.style.display = 'flex';
+                showNotification('Acceso de administrador verificado');
+            } else {
+                alert('Contraseña incorrecta');
+            }
+        }
+       
+        // Abrir modal admin
+        function openAdminModal() {
+            document.getElementById('admin-password').value = '';
+            adminModal.style.display = 'flex';
+        }
+       
+        // Cerrar modal admin
+        function closeAdminModal() {
+            adminModal.style.display = 'none';
+        }
+       
         // Renderizar las publicaciones
         function renderPosts() {
             blogContainer.innerHTML = '';
-            
+           
             let filteredPosts = posts;
-            
+           
             // Aplicar filtro de categoría si existe
             if (currentFilter) {
                 filteredPosts = filteredPosts.filter(post => post.category === currentFilter);
             }
-            
+           
             // Aplicar filtro de búsqueda si existe
             if (currentSearchTerm) {
-                filteredPosts = filteredPosts.filter(post => 
+                filteredPosts = filteredPosts.filter(post =>
                     post.title && post.title.toLowerCase().includes(currentSearchTerm)
                 );
             }
-            
+           
             if (filteredPosts.length === 0) {
                 emptyState.style.display = 'block';
                 if (currentFilter || currentSearchTerm) {
@@ -866,25 +789,25 @@
                 } else {
                     emptyState.innerHTML = `
                         <h3>No hay publicaciones aún</h3>
-                        <p>Haz clic en "Agregar nueva viñeta" para crear tu primera publicación.</p>
+                        <p>Presiona "Cargar datos" para obtener el contenido o verifica como admin para agregar.</p>
                     `;
                 }
                 blogContainer.appendChild(emptyState);
                 return;
             }
-            
+           
             emptyState.style.display = 'none';
-            
+           
             filteredPosts.forEach(post => {
                 const postElement = document.createElement('div');
                 postElement.className = `blog-item ${post.link ? 'has-link' : ''}`;
                 postElement.setAttribute('data-id', post.id);
-                
+               
                 // Aplicar color de fondo si existe
                 if (post.backgroundColor) {
                     postElement.style.backgroundColor = post.backgroundColor;
                 }
-                
+               
                 // Si tiene enlace, hacer que sea clickeable
                 if (post.link) {
                     postElement.addEventListener('click', (e) => {
@@ -894,7 +817,7 @@
                         }
                     });
                 }
-                
+               
                 // Resaltar si está seleccionado para reordenamiento
                 if (reorderMode > 0 && firstSelectedPost && firstSelectedPost.id === post.id) {
                     if (reorderMode === 1) {
@@ -903,7 +826,7 @@
                         postElement.classList.add('selected-for-insert');
                     }
                 }
-                
+               
                 postElement.innerHTML = `
                     ${post.image ? `<img src="${post.image}" alt="${post.title}" class="blog-image">` : ''}
                     <div class="blog-content">
@@ -911,11 +834,11 @@
                         ${post.title ? `<h3 class="blog-title">${post.title}</h3>` : ''}
                         ${post.description ? `<p class="blog-description">${post.description}</p>` : ''}
                         ${post.category ? `<span class="blog-category">${post.category}</span>` : ''}
-                        ${currentMode === 'personal' ? `
+                        ${isAdmin ? `
                         <div class="edit-delete-buttons">
                             <button class="color-btn" data-id="${post.id}" title="Cambiar color">🎨</button>
-                            <button class="reorder-btn ${firstSelectedPost && firstSelectedPost.id === post.id ? 'selected' : ''}" 
-                                    data-id="${post.id}" 
+                            <button class="reorder-btn ${firstSelectedPost && firstSelectedPost.id === post.id ? 'selected' : ''}"
+                                    data-id="${post.id}"
                                     title="Reordenar">⎆</button>
                             <button class="edit-btn" data-id="${post.id}">Editar</button>
                             <button class="delete-btn" data-id="${post.id}">Eliminar</button>
@@ -925,8 +848,8 @@
                 `;
                 blogContainer.appendChild(postElement);
             });
-            
-            if (currentMode === 'personal') {
+           
+            if (isAdmin) {
                 // Agregar event listeners a los botones de editar y eliminar
                 document.querySelectorAll('.edit-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -935,7 +858,7 @@
                         editPost(postId);
                     });
                 });
-                
+               
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation(); // Evitar que se active el enlace de la viñeta
@@ -943,7 +866,7 @@
                         deletePost(postId);
                     });
                 });
-                
+               
                 // Agregar event listeners a los botones de color
                 document.querySelectorAll('.color-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -952,7 +875,7 @@
                         openColorModal(postId);
                     });
                 });
-                
+               
                 // Agregar event listeners a los botones de reordenar
                 document.querySelectorAll('.reorder-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -963,9 +886,10 @@
                 });
             }
         }
-
+       
         // Manejar clic en botón de reordenar
         function handleReorderClick(postId) {
+            if (!isAdmin) return;
             if (reorderMode === 0) {
                 // Primer clic - activar modo intercambio
                 const post = posts.find(p => p.id === postId);
@@ -1012,44 +936,40 @@
                 }
             }
         }
-
+       
         // Intercambiar posiciones de dos publicaciones
         function swapPosts(firstPost, secondPost) {
             const firstIndex = posts.findIndex(p => p.id === firstPost.id);
             const secondIndex = posts.findIndex(p => p.id === secondPost.id);
-            
+           
             if (firstIndex !== -1 && secondIndex !== -1) {
                 // Intercambiar posiciones en el array
                 [posts[firstIndex], posts[secondIndex]] = [posts[secondIndex], posts[firstIndex]];
-                
+               
                 // Guardar y renderizar
                 saveData();
                 renderPosts();
             }
         }
-
+       
         // Mover una publicación detrás de otra
         function movePostBehind(postToMove, targetPost) {
             const moveIndex = posts.findIndex(p => p.id === postToMove.id);
             const targetIndex = posts.findIndex(p => p.id === targetPost.id);
-            
+           
             if (moveIndex !== -1 && targetIndex !== -1) {
                 // Remover la publicación a mover
                 const [movedPost] = posts.splice(moveIndex, 1);
-                
-                // Insertar después del objetivo (si el objetivo está antes en la lista)
-                if (moveIndex > targetIndex) {
-                    posts.splice(targetIndex + 1, 0, movedPost);
-                } else {
-                    posts.splice(targetIndex, 0, movedPost);
-                }
-                
+               
+                // Insertar después del objetivo
+                posts.splice(targetIndex + 1, 0, movedPost);
+               
                 // Guardar y renderizar
                 saveData();
                 renderPosts();
             }
         }
-
+       
         // Cancelar modo de reordenamiento
         function cancelReorderMode() {
             reorderMode = 0;
@@ -1058,38 +978,38 @@
             cancelSwapBtn.style.display = 'none';
             renderPosts();
         }
-
+       
         // Abrir modal para seleccionar color
         function openColorModal(postId) {
-            if (currentMode !== 'personal') return;
-            
+            if (!isAdmin) return;
+           
             // Cancelar modo reordenamiento si está activo
             if (reorderMode > 0) {
                 cancelReorderMode();
             }
-            
+           
             colorEditingPostId = postId;
             const post = posts.find(p => p.id === postId);
-            
+           
             // Establecer el color inicial en el color picker
             if (post && post.backgroundColor) {
                 colorPicker.value = post.backgroundColor;
             } else {
                 colorPicker.value = '#ffffff';
             }
-            
+           
             // Actualizar la paleta de colores favoritos
             updateFavoriteColorsUI();
-            
+           
             colorModal.style.display = 'flex';
         }
-
+       
         // Cerrar modal de color
         function closeColorModal() {
             colorModal.style.display = 'none';
             colorEditingPostId = null;
         }
-
+       
         // Añadir color a favoritos
         function addFavoriteColor() {
             const color = colorPicker.value;
@@ -1102,16 +1022,16 @@
                 showNotification('Este color ya está en favoritos');
             }
         }
-
+       
         // Actualizar la UI de colores favoritos
         function updateFavoriteColorsUI() {
             favoriteColorsContainer.innerHTML = '';
-            
+           
             if (favoriteColors.length === 0) {
                 favoriteColorsContainer.innerHTML = '<p>No hay colores favoritos aún.</p>';
                 return;
             }
-            
+           
             favoriteColors.forEach(color => {
                 const colorElement = document.createElement('div');
                 colorElement.className = 'favorite-color';
@@ -1119,7 +1039,7 @@
                 if (color === colorPicker.value) {
                     colorElement.classList.add('selected');
                 }
-                
+               
                 const removeBtn = document.createElement('span');
                 removeBtn.className = 'remove-favorite';
                 removeBtn.textContent = '×';
@@ -1127,17 +1047,17 @@
                     e.stopPropagation();
                     removeFavoriteColor(color);
                 });
-                
+               
                 colorElement.addEventListener('click', () => {
                     colorPicker.value = color;
                     updateFavoriteColorsUI();
                 });
-                
+               
                 colorElement.appendChild(removeBtn);
                 favoriteColorsContainer.appendChild(colorElement);
             });
         }
-
+       
         // Eliminar color favorito
         function removeFavoriteColor(color) {
             favoriteColors = favoriteColors.filter(c => c !== color);
@@ -1145,15 +1065,15 @@
             updateFavoriteColorsUI();
             showNotification('Color eliminado de favoritos');
         }
-
+       
         // Guardar color seleccionado
         function saveColor() {
-            if (currentMode !== 'personal') return;
-            
+            if (!isAdmin) return;
+           
             const color = colorPicker.value;
             if (colorEditingPostId) {
                 const index = posts.findIndex(post => post.id === colorEditingPostId);
-                
+               
                 if (index !== -1) {
                     posts[index].backgroundColor = color;
                     saveData();
@@ -1163,26 +1083,26 @@
                 }
             }
         }
-
-        // Abrir modal para nueva publicación (solo en modo personal)
+       
+        // Abrir modal para nueva publicación
         function openPostModal(post = null) {
-            if (currentMode !== 'personal') return;
-            
+            if (!isAdmin) return;
+           
             // Cancelar modo reordenamiento si está activo
             if (reorderMode > 0) {
                 cancelReorderMode();
             }
-            
+           
             editingPostId = post ? post.id : null;
             document.getElementById('modal-title').textContent = post ? 'Editar Publicación' : 'Nueva Publicación';
             document.getElementById('post-image').value = post ? post.image : '';
             document.getElementById('post-title').value = post ? post.title : '';
             document.getElementById('post-description').value = post ? post.description : '';
             document.getElementById('post-link').value = post ? post.link || '' : '';
-            
+           
             // Actualizar categorías disponibles
             updateCategoriesUI();
-            
+           
             // Marcar categoría seleccionada si existe
             if (post && post.category) {
                 const categoryBadge = document.querySelector(`.category-badge[data-category="${post.category}"]`);
@@ -1190,29 +1110,29 @@
                     categoryBadge.classList.add('selected');
                 }
             }
-            
+           
             postModal.style.display = 'flex';
         }
-
+       
         // Cerrar modal de publicación
         function closePostModal() {
             postModal.style.display = 'none';
             editingPostId = null;
         }
-
-        // Guardar publicación (solo en modo personal)
+       
+        // Guardar publicación
         function savePost() {
-            if (currentMode !== 'personal') return;
-            
+            if (!isAdmin) return;
+           
             const image = document.getElementById('post-image').value;
             const title = document.getElementById('post-title').value;
             const description = document.getElementById('post-description').value;
             const link = document.getElementById('post-link').value;
-            
+           
             // Obtener categoría seleccionada
             const selectedCategory = document.querySelector('.category-badge.selected');
             const category = selectedCategory ? selectedCategory.getAttribute('data-category') : '';
-            
+           
             if (editingPostId) {
                 // Editar publicación existente
                 const index = posts.findIndex(post => post.id === editingPostId);
@@ -1240,38 +1160,38 @@
                 };
                 posts.unshift(newPost);
             }
-            
+           
             // Guardar y actualizar
             saveData();
             renderPosts();
             closePostModal();
             showNotification('¡Publicación guardada correctamente!');
         }
-
-        // Editar publicación (solo en modo personal)
+       
+        // Editar publicación
         function editPost(postId) {
-            if (currentMode !== 'personal') return;
-            
+            if (!isAdmin) return;
+           
             // Cancelar modo reordenamiento si está activo
             if (reorderMode > 0) {
                 cancelReorderMode();
             }
-            
+           
             const post = posts.find(p => p.id === postId);
             if (post) {
                 openPostModal(post);
             }
         }
-
-        // Eliminar publicación (solo en modo personal)
+       
+        // Eliminar publicación
         function deletePost(postId) {
-            if (currentMode !== 'personal') return;
-            
+            if (!isAdmin) return;
+           
             // Cancelar modo reordenamiento si está activo
             if (reorderMode > 0) {
                 cancelReorderMode();
             }
-            
+           
             if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
                 posts = posts.filter(post => post.id !== postId);
                 saveData();
@@ -1279,31 +1199,31 @@
                 showNotification('Publicación eliminada correctamente');
             }
         }
-
-        // Abrir modal para crear categoría (solo en modo personal)
+       
+        // Abrir modal para crear categoría
         function openCategoryModal() {
-            if (currentMode !== 'personal') return;
-            
+            if (!isAdmin) return;
+           
             // Cancelar modo reordenamiento si está activo
             if (reorderMode > 0) {
                 cancelReorderMode();
             }
-            
+           
             categoryModal.style.display = 'flex';
         }
-
+       
         // Cerrar modal de categoría
         function closeCategoryModal() {
             document.getElementById('new-category').value = '';
             categoryModal.style.display = 'none';
         }
-
-        // Guardar categoría (solo en modo personal)
+       
+        // Guardar categoría
         function saveCategory() {
-            if (currentMode !== 'personal') return;
-            
+            if (!isAdmin) return;
+           
             const categoryName = document.getElementById('new-category').value.trim();
-            
+           
             if (categoryName && !categories.includes(categoryName)) {
                 categories.push(categoryName);
                 saveData();
@@ -1314,48 +1234,16 @@
                 alert('Esta categoría ya existe.');
             }
         }
-
-        // Abrir modal de filtro para modo por defecto
-        function openFilterDefaultModal() {
-            if (currentMode !== 'default') return;
-            
-            updateFilterDefaultCategoriesUI();
-            filterDefaultModal.style.display = 'flex';
-        }
-
-        // Cerrar modal de filtro para modo por defecto
-        function closeFilterDefaultModal() {
-            filterDefaultModal.style.display = 'none';
-        }
-
-        // Actualizar la UI de categorías para el filtro (modo por defecto)
-        function updateFilterDefaultCategoriesUI() {
-            filterDefaultCategoriesContainer.innerHTML = '';
-            
-            if (categories.length === 0) {
-                filterDefaultCategoriesContainer.innerHTML = '<p>No hay categorías disponibles.</p>';
-                return;
-            }
-            
-            categories.forEach(category => {
-                const badge = document.createElement('span');
-                badge.className = 'category-badge';
-                badge.textContent = category;
-                badge.setAttribute('data-category', category);
-                badge.addEventListener('click', () => filterByCategory(category));
-                filterDefaultCategoriesContainer.appendChild(badge);
-            });
-        }
-
+       
         // Actualizar la UI de categorías
         function updateCategoriesUI() {
             categoriesContainer.innerHTML = '';
-            
+           
             if (categories.length === 0) {
                 categoriesContainer.innerHTML = '<p>No hay categorías creadas aún.</p>';
                 return;
             }
-            
+           
             categories.forEach(category => {
                 const badge = document.createElement('span');
                 badge.className = 'category-badge';
@@ -1364,20 +1252,20 @@
                 badge.addEventListener('click', toggleCategorySelection);
                 categoriesContainer.appendChild(badge);
             });
-            
+           
             // Actualizar también el modal de filtro
             updateFilterCategoriesUI();
         }
-
+       
         // Actualizar la UI de categorías para el filtro
         function updateFilterCategoriesUI() {
             filterCategoriesContainer.innerHTML = '';
-            
+           
             if (categories.length === 0) {
                 filterCategoriesContainer.innerHTML = '<p>No hay categorías creadas aún.</p>';
                 return;
             }
-            
+           
             categories.forEach(category => {
                 const badge = document.createElement('span');
                 badge.className = 'category-badge';
@@ -1387,173 +1275,64 @@
                 filterCategoriesContainer.appendChild(badge);
             });
         }
-
+       
         // Alternar selección de categoría
         function toggleCategorySelection(e) {
-            if (currentMode !== 'personal') return;
-            
             // Deseleccionar todas las categorías
             document.querySelectorAll('.category-badge').forEach(badge => {
                 badge.classList.remove('selected');
             });
-            
+           
             // Seleccionar la categoría clickeada
             e.target.classList.add('selected');
         }
-
+       
         // Abrir modal de filtro
         function openFilterModal() {
-            if (currentMode !== 'personal') return;
-            
-            // Cancelar modo reordenamiento si está activo
-            if (reorderMode > 0) {
-                cancelReorderMode();
-            }
-            
             updateFilterCategoriesUI();
             filterModal.style.display = 'flex';
         }
-
+       
         // Cerrar modal de filtro
         function closeFilterModal() {
             filterModal.style.display = 'none';
         }
-
+       
         // Filtrar por categoría
         function filterByCategory(category) {
             currentFilter = category;
             renderPosts();
             closeFilterModal();
-            closeFilterDefaultModal();
         }
-
+       
         // Limpiar filtro
         function clearFilter() {
             currentFilter = null;
             renderPosts();
             closeFilterModal();
-            closeFilterDefaultModal();
         }
-
-        // Guardar datos en localStorage (solo en modo personal)
+       
+        // Guardar datos en localStorage
         function saveData() {
-            if (currentMode !== 'personal') return;
-            
             const data = {
                 posts,
                 categories,
                 favoriteColors
             };
-            
+           
             localStorage.setItem('blogData', JSON.stringify(data));
-            updateJSONView();
         }
-
-        // Actualizar la vista del JSON
-        function updateJSONView() {
-            const data = {
-                posts,
-                categories,
-                favoriteColors
-            };
-            
-            jsonViewer.textContent = JSON.stringify(data, null, 2);
-        }
-
-        // Descargar JSON (solo en modo personal)
-        function downloadJSON() {
-            if (currentMode !== 'personal') return;
-            
-            // Cancelar modo reordenamiento si está activo
-            if (reorderMode > 0) {
-                cancelReorderMode();
-            }
-            
-            const data = {
-                posts,
-                categories,
-                favoriteColors
-            };
-            
-            const jsonString = JSON.stringify(data, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'blog-data-personal.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('JSON personal descargado correctamente');
-        }
-
-        // Descargar JSON por defecto
-        function downloadDefaultJSON() {
-            const jsonString = JSON.stringify(defaultData, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'pepito.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('JSON por defecto descargado correctamente');
-        }
-
-        // Cargar JSON desde archivo (solo en modo personal)
-        function loadJSONFromFile(event) {
-            if (currentMode !== 'personal') return;
-            
-            // Cancelar modo reordenamiento si está activo
-            if (reorderMode > 0) {
-                cancelReorderMode();
-            }
-            
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.posts && data.categories) {
-                        posts = data.posts;
-                        categories = data.categories;
-                        favoriteColors = data.favoriteColors || [];
-                        saveData();
-                        renderPosts();
-                        showNotification('Datos cargados correctamente desde el JSON');
-                    } else {
-                        alert('El archivo JSON no tiene el formato correcto.');
-                    }
-                } catch (error) {
-                    alert('Error al parsear el archivo JSON: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
-            
-            // Limpiar el input
-            event.target.value = '';
-        }
-
+       
         // Mostrar notificación
         function showNotification(message) {
             notification.textContent = message;
             notification.classList.add('show');
-            
+           
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
         }
-
+       
         // Inicializar la aplicación
         init();
     </script>
